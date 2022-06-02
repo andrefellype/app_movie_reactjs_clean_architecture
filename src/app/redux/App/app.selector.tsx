@@ -1,0 +1,1 @@
+export const getInformationApp = state => state.appReducer.informationApp
