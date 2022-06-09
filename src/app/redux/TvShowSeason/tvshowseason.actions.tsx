@@ -95,6 +95,20 @@ export const registerTvShowSeason = (tvShowIdValue: string, nameValue: string, c
     })
 }
 
+function orderTvShowSeasons(seasons) {
+    return seasons.sort((seasonA, seasonB) => {
+        const nameSeA = seasonA.name.substring(0, seasonA.name.indexOf("°"))
+        const nameSeB = seasonB.name.substring(0, seasonB.name.indexOf("°"))
+        if (parseInt(nameSeA, 10) > parseInt(nameSeB, 10)) {
+            return 1
+        }
+        if (parseInt(nameSeA, 10) < parseInt(nameSeB, 10)) {
+            return -1
+        }
+        return 0
+    })
+}
+
 function searchTvShowSeasons(seasons, search: string) {
     return seasons.filter(season => season.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
@@ -107,7 +121,8 @@ export const getTvShowSeasonAllByNotMyTvShow = (tvShowIdValue: string, callbackS
         if (response.data.status) {
             const dataApi = response.data.datas
             const seasonsValue = dataApi
-            const seasonsFilterValue = searchTvShowSeasons(seasonsValue, searchTextValue)
+            let seasonsFilterValue = searchTvShowSeasons(seasonsValue, searchTextValue)
+            seasonsFilterValue = orderTvShowSeasons(seasonsValue)
             dispatch({ type: TV_SHOW_SEASON_LIST_REDUCER, seasons: seasonsValue, seasonsFilter: seasonsFilterValue })
             callbackSuccess()
         } else {
@@ -119,7 +134,8 @@ export const getTvShowSeasonAllByNotMyTvShow = (tvShowIdValue: string, callbackS
 }
 
 export const getTvShowSeasonAllBySearch = (searchValue: string, seasonsGeneral: []) => async dispatch => {
-    const seasonsValue = searchTvShowSeasons(seasonsGeneral, searchValue)
+    let seasonsValue = searchTvShowSeasons(seasonsGeneral, searchValue)
+    seasonsValue = orderTvShowSeasons(seasonsValue)
     dispatch({ type: TV_SHOW_SEASON_LIST_FILTER_REDUCER, seasons: seasonsValue })
 }
 
@@ -131,7 +147,8 @@ export const getTvShowSeasonAll = (tvShowIdValue: string, callbackSuccess: () =>
         if (response.data.status) {
             const dataApi = response.data.datas
             const seasonsValue = dataApi
-            const seasonsFilterValue = searchTvShowSeasons(seasonsValue, searchTextValue)
+            let seasonsFilterValue = searchTvShowSeasons(seasonsValue, searchTextValue)
+            seasonsFilterValue = orderTvShowSeasons(seasonsFilterValue)
             dispatch({ type: TV_SHOW_SEASON_LIST_REDUCER, seasons: seasonsValue, seasonsFilter: seasonsFilterValue })
             callbackSuccess()
         } else {

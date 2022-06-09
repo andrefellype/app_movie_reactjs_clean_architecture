@@ -99,6 +99,20 @@ function searchTvShowEpisodes(episodes, search: string) {
     return episodes.filter(episode => episode.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 
+function orderTvShowEpisodes(episodes) {
+    return episodes.sort((episodeA, episodeB) => {
+        const nameEpA = episodeA.name.substring(0, episodeA.name.indexOf("°"))
+        const nameEpB = episodeB.name.substring(0, episodeB.name.indexOf("°"))
+        if (parseInt(nameEpA, 10) > parseInt(nameEpB, 10)) {
+            return 1
+        }
+        if (parseInt(nameEpA, 10) < parseInt(nameEpB, 10)) {
+            return -1
+        }
+        return 0
+    })
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getTvShowEpisodeAllByNotMyTvShow = (tvShowSeasonIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void, searchTextValue = "") => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
@@ -107,7 +121,8 @@ export const getTvShowEpisodeAllByNotMyTvShow = (tvShowSeasonIdValue: string, ca
         if (response.data.status) {
             const dataApi = response.data.datas
             const episodesValue = dataApi
-            const episodesFilterValue = searchTvShowEpisodes(episodesValue, searchTextValue)
+            let episodesFilterValue = searchTvShowEpisodes(episodesValue, searchTextValue)
+            episodesFilterValue = orderTvShowEpisodes(episodesFilterValue)
             dispatch({ type: TV_SHOW_EPISODE_LIST_REDUCER, episodes: episodesValue, episodesFilter: episodesFilterValue })
             callbackSuccess()
         } else {
@@ -119,7 +134,8 @@ export const getTvShowEpisodeAllByNotMyTvShow = (tvShowSeasonIdValue: string, ca
 }
 
 export const getTvShowEpisodeAllBySearch = (searchValue: string, episodesGeneral: []) => async dispatch => {
-    const episodesValue = searchTvShowEpisodes(episodesGeneral, searchValue)
+    let episodesValue = searchTvShowEpisodes(episodesGeneral, searchValue)
+    episodesValue = orderTvShowEpisodes(episodesValue)
     dispatch({ type: TV_SHOW_EPISODE_LIST_FILTER_REDUCER, episodes: episodesValue })
 }
 
@@ -131,7 +147,8 @@ export const getTvShowEpisodeAll = (tvShowSeasonIdValue: string, callbackSuccess
         if (response.data.status) {
             const dataApi = response.data.datas
             const episodesValue = dataApi
-            const episodesFilterValue = searchTvShowEpisodes(episodesValue, searchTextValue)
+            let episodesFilterValue = searchTvShowEpisodes(episodesValue, searchTextValue)
+            episodesFilterValue = orderTvShowEpisodes(episodesFilterValue)
             dispatch({ type: TV_SHOW_EPISODE_LIST_REDUCER, episodes: episodesValue, episodesFilter: episodesFilterValue })
             callbackSuccess()
         } else {

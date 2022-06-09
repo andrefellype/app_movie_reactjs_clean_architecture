@@ -1,4 +1,4 @@
-export const SYSTEM_URL = "http://192.168.1.35:3333/"
+export const SYSTEM_URL = "http://127.0.0.1:3333/"
 export const SYSTEM_API_VERSION = "1.0.0"
 
 export const LOCAL_STORAGE = "local_appmovie"
