@@ -2,7 +2,7 @@
 import ConvertDate from "../../components/Utils/ConvertDate"
 import CryptographyConvert from "../../components/CryptographyConvert"
 import api from "../../core/api"
-import { TOKEN_LOCAL_STORAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER, USER_LOCAL_STORAGE, USER_SINGLE_REDUCER } from "../../core/consts"
+import { TOKEN_LOCAL_STORAGE, URL_FAIL_PAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER, USER_LOCAL_STORAGE, USER_SINGLE_REDUCER } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const updatePassword = (userIdValue: string, passwordValue: string, confirmPassword: string, callbackSuccess: () => void, callbackError: (errorMsg) => void) => async dispatch => {
@@ -313,19 +313,21 @@ export const recoveryUserPassword = async (cellphoneValue: string, callbackSucce
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const isVerifyUser = (callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    if (token !== null) {
-        api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-        await api.post("user/refresh/token", {}).then(response => {
-            if (response.data.status) {
-                const dataApi = response.data.data
-                localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
-            } else {
-                callbackError(response.data.errors.map(erro => `${erro.msg}`))
-            }
-        }).catch(() => {
-            window.location.href = "/failpage/error_api"
-        })
+    if (window.location.pathname.indexOf(URL_FAIL_PAGE) === -1) {
+        const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
+        if (token !== null) {
+            api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
+            await api.post("user/refresh/token", {}).then(response => {
+                if (response.data.status) {
+                    const dataApi = response.data.data
+                    localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
+                } else {
+                    callbackError(response.data.errors.map(erro => `${erro.msg}`))
+                }
+            }).catch(() => {
+                window.location.href = "/failpage/error_api"
+            })
+        }
     }
 }
 
