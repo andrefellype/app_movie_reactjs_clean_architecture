@@ -317,7 +317,7 @@ export const isVerifyUser = (callbackError: (errorsMsg: string[]) => void) => as
         const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
         if (token !== null) {
             api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-            await api.post("user/refresh/token", {}).then(response => {
+            await api.post("user/refresh/token").then(response => {
                 if (response.data.status) {
                     const dataApi = response.data.data
                     localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
