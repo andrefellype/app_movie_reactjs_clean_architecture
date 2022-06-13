@@ -120,7 +120,7 @@ function App() {
         } else if (checkUser === 1) {
             statusSignIn = getAuthenticate
         }
-        if (getAuthenticate) {
+        if (checkUser === 1 && getAuthenticate) {
             if (checkLevels.length > 0) {
                 statusSignIn = checkLevels.filter(cl => getAuthenticate.level === cl).length > 0
             }
