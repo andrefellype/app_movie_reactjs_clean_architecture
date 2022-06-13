@@ -19,17 +19,6 @@ function UserEditPassword() {
 
     const getUser = useSelector(getUserSingle)
 
-    React.useEffect(() => {
-        if (userId !== null && typeof userId !== "undefined") {
-            dispatch(showLoadingMain(true))
-            dispatch(openUserById(userId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
-                dispatch(showLoadingMain(false))
-                dispatch(insertMsgs(errorsMsg, 'error'))
-            }))
-        }
-        // eslint-disable-next-line
-    }, [])
-
     async function verifyIdUser() {
         const userLocal = await localStorage.getItem(USER_LOCAL_STORAGE)
         if (userLocal !== null) {
@@ -44,14 +33,24 @@ function UserEditPassword() {
         return true
     }
 
-    React.useEffect(() => {
+    function verifyLevelUser(userActual) {
         verifyIdUser().then(statusVerify => {
-            if (getUser && (getUser.level === "COMMON" || !statusVerify)) {
+            if (userActual && (userActual.level === "COMMON" || !statusVerify)) {
                 navigate(URL_PANEL_HOME)
             }
         })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [getUser])
+    }
+
+    React.useEffect(() => {
+        if (userId !== null && typeof userId !== "undefined") {
+            dispatch(showLoadingMain(true))
+            dispatch(openUserById(userId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+                dispatch(showLoadingMain(false))
+                dispatch(insertMsgs(errorsMsg, 'error'))
+            }, (userActual) => verifyLevelUser(userActual)))
+        }
+        // eslint-disable-next-line
+    }, [])
 
     async function updateUser(passwordField: string, confirmPasswordField: string) {
         if (userId !== null && typeof userId !== "undefined") {

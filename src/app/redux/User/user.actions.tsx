@@ -20,7 +20,7 @@ export const updatePassword = (userIdValue: string, passwordValue: string, confi
     })
 }
 
-export const openUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
+export const openUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void, callbackUser: ((userActual) => void) | null = null) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("user/open", { userId: userIdValue }).then(response => {
@@ -28,6 +28,9 @@ export const openUserById = (userIdValue: string, callbackSuccess: () => void, c
             const dataApi = response.data.data
             dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi })
             callbackSuccess()
+            if (callbackUser !== null) {
+                callbackUser(dataApi)
+            }
         } else {
             callbackError(response.data.errors.map(erro => `${erro.msg}`))
         }
