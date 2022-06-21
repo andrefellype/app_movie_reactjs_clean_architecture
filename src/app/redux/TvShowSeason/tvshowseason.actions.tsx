@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { TOKEN_LOCAL_STORAGE, TV_SHOW_SEASON_LIST_FILTER_REDUCER, TV_SHOW_SEASON_LIST_REDUCER, TV_SHOW_SEASON_SINGLE_REDUCER } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralTvShowSeason = (ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralTvShowSeasonByIds = (ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("tvshowseason/delete/several", { _ids: JSON.stringify(ids) }).then(response => {
@@ -18,7 +18,7 @@ export const deleteSeveralTvShowSeason = (ids: string[], callbackSuccess: () => 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteTvShowSeason = (tvShowSeasonIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteTvShowSeasonById = (tvShowSeasonIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("tvshowseason/delete", { tvShowSeasonId: tvShowSeasonIdValue }).then(response => {
@@ -33,7 +33,7 @@ export const deleteTvShowSeason = (tvShowSeasonIdValue: string, callbackSuccess:
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedTvShowSeason = (tvShowSeasonIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const approvedTvShowSeasonById = (tvShowSeasonIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("tvshowseason/approved/reviewed", { tvShowSeasonId: tvShowSeasonIdValue }).then(response => {
@@ -48,7 +48,7 @@ export const approvedTvShowSeason = (tvShowSeasonIdValue: string, callbackSucces
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateTvShowSeason = (tvShowSeasonIdValue: string, nameValue: string, tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateTvShowSeasonById = (tvShowSeasonIdValue: string, nameValue: string, tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const objectData = { tvShowSeasonId: tvShowSeasonIdValue, name: nameValue, tvShowId: tvShowIdValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token

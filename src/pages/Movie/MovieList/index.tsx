@@ -2,7 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import MovieListView from './view'
 import { getCategoryAll } from '../../../app/redux/Category/category.actions'
 import { getMoviesAll, getMoviesAllFilter } from '../../../app/redux/Movie/movie.selector'
@@ -28,18 +28,18 @@ function MovieList() {
     const orderDefaultValue = "title"
 
     async function refreshList(orderField = orderDefaultValue, searchText = "", categoryFilter = "", releaseFilter = "", durationMinFilter = "", durationMaxFilter = "", countryFilter = "") {
-        dispatch(showLoadingMain(true))
+        dispatch(showLoading(true))
         dispatch(getCategoryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, ""))
         dispatch(getCountryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
-        dispatch(getMovieAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        dispatch(getMovieAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, orderField, searchText, categoryFilter, releaseFilter, durationMinFilter, durationMaxFilter, countryFilter))
     }
 

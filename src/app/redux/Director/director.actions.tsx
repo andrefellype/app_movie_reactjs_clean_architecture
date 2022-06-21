@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { DIRECTOR_LIST_FILTER_REDUCER, DIRECTOR_LIST_REDUCER, DIRECTOR_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralDirector = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralDirectorByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("director/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
@@ -18,7 +18,7 @@ export const deleteSeveralDirector = (_ids: string[], callbackSuccess: () => voi
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteDirector = (directorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteDirectorById = (directorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("director/delete", { directorId: directorIdValue }).then(response => {
@@ -33,7 +33,7 @@ export const deleteDirector = (directorIdValue: string, callbackSuccess: () => v
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedReviewedDirector = (directorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const approvedReviewedDirectorById = (directorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("director/approved/reviewed", { directorId: directorIdValue }).then(response => {
@@ -48,7 +48,7 @@ export const approvedReviewedDirector = (directorIdValue: string, callbackSucces
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateDirector = (directorIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateDirectorById = (directorIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const objectData = { directorId: directorIdValue, name: nameValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token

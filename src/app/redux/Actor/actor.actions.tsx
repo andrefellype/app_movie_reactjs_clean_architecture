@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { ACTOR_LIST_FILTER_REDUCER, ACTOR_LIST_REDUCER, ACTOR_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralActor = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralActorByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("actor/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
@@ -18,7 +18,7 @@ export const deleteSeveralActor = (_ids: string[], callbackSuccess: () => void, 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteActor = (actorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteActorById = (actorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("actor/delete", { actorId: actorIdValue }).then(response => {
@@ -33,7 +33,7 @@ export const deleteActor = (actorIdValue: string, callbackSuccess: () => void, c
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedReviewedActor = (actorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const approvedReviewedActorById = (actorIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("actor/approved/reviewed", { actorId: actorIdValue }).then(response => {
@@ -48,7 +48,7 @@ export const approvedReviewedActor = (actorIdValue: string, callbackSuccess: () 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateActor = (actorIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg) => void) => async dispatch => {
+export const updateActorById = (actorIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg) => void) => async dispatch => {
     const objectData = { actorId: actorIdValue, name: nameValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token

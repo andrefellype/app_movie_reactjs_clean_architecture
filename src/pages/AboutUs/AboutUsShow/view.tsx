@@ -10,7 +10,7 @@ import ButtonDanger from '../../../app/components/Button/ButtonDanger'
 import DialogYesOrNot from '../../../app/components/Dialog/DialogYesOrNot'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
-import { MSG_DELETE_REGISTER_QUESTION, URL_ABOUT_EDIT, URL_ABOUT_NEW } from '../../../app/core/consts'
+import { MSG_DELETE_REGISTER_QUESTION, URL_ABOUT_US_EDIT, URL_ABOUT_US_NEW } from '../../../app/core/consts'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -23,7 +23,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const AboutAppView: React.FC<{ getAutenticate: any, informationApp: any, actionDeleteApp: any }> = function ({ getAutenticate, informationApp, actionDeleteApp }) {
+const AboutUsShowView: React.FC<{ getAutenticate: any, getAboutUs: any, actionDeleteAboutUs: any }> = function ({ getAutenticate, getAboutUs, actionDeleteAboutUs }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -32,7 +32,7 @@ const AboutAppView: React.FC<{ getAutenticate: any, informationApp: any, actionD
 
     async function deleteApp() {
         await setIsDelete(false)
-        actionDeleteApp()
+        actionDeleteAboutUs()
     }
 
     return (
@@ -41,19 +41,19 @@ const AboutAppView: React.FC<{ getAutenticate: any, informationApp: any, actionD
                 <Grid item md={6} xs={12}>
                     <Card>
                         <CardActions className={classes.flex_end}>
-                            <ButtonSuccess title={!informationApp ? "ADICIONAR CONTEÚDO" : "EDITAR CONTEÚDO"}
-                                iconStart={!informationApp ? ICON_OBJECT_LIST.ADD_ICON : ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => navigate(!informationApp ? URL_ABOUT_NEW : URL_ABOUT_EDIT)} />
-                            {informationApp && <ButtonDanger title="APAGAR CONTEÚDO" iconStart={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIsDelete(true)} />}
+                            <ButtonSuccess title={!getAboutUs ? "ADICIONAR CONTEÚDO" : "EDITAR CONTEÚDO"}
+                                iconStart={!getAboutUs ? ICON_OBJECT_LIST.ADD_ICON : ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => navigate(!getAboutUs ? URL_ABOUT_US_NEW : URL_ABOUT_US_EDIT)} />
+                            {getAboutUs && <ButtonDanger title="APAGAR CONTEÚDO" iconStart={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIsDelete(true)} />}
                         </CardActions>
                     </Card>
                 </Grid>
             </Grid>}
-            {informationApp && <Grid container spacing={2}>
+            {getAboutUs && <Grid container spacing={2}>
                 <Grid item md={6} xs={12}>
                     <Card>
                         <CardActions className={classes.flex_center}>
                             <Typography style={{ marginTop: 5, marginBottom: 5, fontWeight: 'bold' }} variant="h5" component="h5">
-                                <div dangerouslySetInnerHTML={{ __html: informationApp.web }} />
+                                <div dangerouslySetInnerHTML={{ __html: getAboutUs.web }} />
                             </Typography>
                         </CardActions>
                     </Card>
@@ -65,4 +65,4 @@ const AboutAppView: React.FC<{ getAutenticate: any, informationApp: any, actionD
     )
 }
 
-export default AboutAppView
+export default AboutUsShowView

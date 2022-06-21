@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { MY_TV_SHOW_LIST_FILTER_REDUCER, MY_TV_SHOW_LIST_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteMyTvShow = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteMyTvShowByTvShowId = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("mytvshow/delete", { tvShowId: tvShowIdValue }).then(response => {

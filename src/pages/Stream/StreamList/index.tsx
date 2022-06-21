@@ -2,7 +2,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { getStreamAll } from '../../../app/redux/Stream/stream.actions'
 import { getStreamsAll, getStreamsAllFilter } from '../../../app/redux/Stream/stream.selector'
@@ -19,10 +19,10 @@ function StreamList() {
     const streamsGeneral = useSelector(getStreamsAll)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getStreamAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 1, searchText))
     }
 

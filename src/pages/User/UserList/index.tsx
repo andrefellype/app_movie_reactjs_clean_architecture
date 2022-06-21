@@ -4,7 +4,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getUsersAll, getUsersAllFilter } from '../../../app/redux/User/user.selector'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { URL_USER_UPDATE_PASSWORD } from '../../../app/core/consts'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { getUserAll } from '../../../app/redux/User/user.actions'
@@ -25,10 +25,10 @@ function UserList() {
     const orderDefaultValue = "name"
 
     async function refreshList(orderField = orderDefaultValue, searchText = "", levelFilter = "") {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getUserAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getUserAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, orderField, searchText, levelFilter))
     }
 

@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-underscore-dangle */
 import React from 'react'
 import { Card, CardActions, Grid, InputAdornment, IconButton } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
-import { useNavigate } from 'react-router'
+
 import PageCard from "../../../app/components/PageCard"
 import ButtonSuccess from '../../../app/components/Button/ButtonSuccess'
 import IconList from '../../../app/components/IconList'
-import FormControlField from '../../../app/components/FormControl/FormControlField'
-import ButtonIndigo from '../../../app/components/Button/ButtonIndigo'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
+import FormControlField from '../../../app/components/FormControl/FormControlField'
 import FormControlFieldMask from '../../../app/components/FormControl/FormControlFieldMask'
 import ConvertDate from '../../../app/components/Utils/ConvertDate'
-import { URL_USERS } from '../../../app/core/consts'
 
 const useStyles = makeStyles(() => ({
     button_end: {
@@ -22,10 +19,9 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const UserEditPasswordView: React.FC<{ getUser: any, update: any }> = function ({ getUser, update }) {
+const UpdateUserAuthPasswordView: React.FC<{ getUser: any, update: any }> = function ({ getUser, update }) {
 
     const classes = useStyles()
-    const navigate = useNavigate()
 
     const [passwordField, setPasswordField] = React.useState("")
     const [confirmPasswordField, setConfirmPasswordField] = React.useState("")
@@ -33,7 +29,7 @@ const UserEditPasswordView: React.FC<{ getUser: any, update: any }> = function (
     const [confirmViewPassword, setConfirmViewPassword] = React.useState(false)
 
     return (
-        <PageCard title="EDITAR SENHA" sizeLg={9} sizeXs={12}>
+        <PageCard title="EDITAR MINHA SENHA" sizeLg={9} sizeXs={12}>
             <Grid container spacing={2}>
                 <Grid item lg={9} xs={12}>
                     <Card>
@@ -43,13 +39,13 @@ const UserEditPasswordView: React.FC<{ getUser: any, update: any }> = function (
                                     <FormControlField isDisabled={!getUser} labelValue="NOME" valueDefault={getUser ? getUser.name : ""} />
                                 </Grid>
                                 <Grid item md={3} xs={12}>
-                                    <FormControlFieldMask isDisabled={!getUser} valueMask="99/99/9999" labelValue={(getUser && getUser.birth) ? "NASCIMENTO" : ""} valueDefault={(getUser && getUser.birth) ? ConvertDate(getUser.birth, "stringEUAToStringBR") : ""} />
+                                    <FormControlFieldMask isDisabled={!getUser} valueMask="99/99/9999" labelValue={getUser ? "NASCIMENTO" : ""} valueDefault={getUser ? ConvertDate(getUser.birth, "stringEUAToStringBR") : ""} />
                                 </Grid>
                                 <Grid item md={3} xs={12}>
-                                    <FormControlFieldMask isDisabled={!getUser} valueMask="(99) 99999-9999" labelValue={(getUser && getUser.cellphone) ? "CELULAR" : ""} valueDefault={(getUser && getUser.cellphone) ? getUser.cellphone : ""} />
+                                    <FormControlFieldMask isDisabled={!getUser} valueMask="(99) 99999-9999" labelValue={getUser ? "CELULAR" : ""} valueDefault={getUser ? getUser.cellphone : ""} />
                                 </Grid>
                                 <Grid item md={6} xs={12}>
-                                    <FormControlField isDisabled={!getUser} labelValue={(getUser && getUser.email) ? "EMAIL" : ""} valueDefault={(getUser && getUser.email) ? getUser.email : ""} />
+                                    <FormControlField isDisabled={!getUser} labelValue={getUser ? "EMAIL" : ""} valueDefault={(getUser && getUser.email) ? getUser.email : ""} />
                                 </Grid>
                                 <Grid item sm={3} xs={12}>
                                     <FormControlField isDisabled={!getUser} typeField={viewPassword ? "text" : "password"} labelValue="SENHA*" valueDefault={passwordField} InputProps={{
@@ -75,7 +71,6 @@ const UserEditPasswordView: React.FC<{ getUser: any, update: any }> = function (
                         </CardActions>
                         <CardActions className={classes.button_end}>
                             <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getUser} actionClick={() => update(passwordField, confirmPasswordField)} />
-                            <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_USERS)} />
                         </CardActions>
                     </Card>
                 </Grid>
@@ -84,4 +79,4 @@ const UserEditPasswordView: React.FC<{ getUser: any, update: any }> = function (
     )
 }
 
-export default UserEditPasswordView
+export default UpdateUserAuthPasswordView

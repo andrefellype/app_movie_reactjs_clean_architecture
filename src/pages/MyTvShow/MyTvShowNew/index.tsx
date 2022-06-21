@@ -1,7 +1,7 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { MSG_NEW_REGISTER_SUCCESS, MSG_REMOVE_REGISTER, MSG_REMOVE_REGISTER_SUCCESS, MSG_SAVED_DATA } from '../../../app/core/consts'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { registerMyTvShow, registerNeverWatch } from '../../../app/redux/MyTvShow/myTvShow.actions'
 import { getTvShowAllByNotMyTvShow } from '../../../app/redux/TvShow/tvshow.actions'
@@ -23,66 +23,66 @@ function MyTvShowNew() {
     const tvShowEpisodes = useSelector(getTvShowEpisodesAllFilter)
 
     React.useEffect(() => {
-        dispatch(showLoadingMain(true))
-        dispatch(getTvShowAllByNotMyTvShow(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        dispatch(showLoading(true))
+        dispatch(getTvShowAllByNotMyTvShow(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListEpisode(seasonId: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
+        await dispatch(showLoading(true))
         await dispatch(getTvShowEpisodeAllByNotMyTvShow(seasonId, () => {
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
             callbackSucess()
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }))
     }
 
     async function refreshListSeason(tvShowId: string, callbackSucess: () => void) {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            await dispatch(showLoadingMain(true))
+            await dispatch(showLoading(true))
             await dispatch(getTvShowSeasonAllByNotMyTvShow(tvShowId, () => {
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
                 callbackSucess()
             }, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
         }
     }
 
     async function refreshListTvShow(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getTvShowAllByNotMyTvShow(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getTvShowAllByNotMyTvShow(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, searchText))
         callbackSucess()
     }
 
     async function insertMyTvShow(episodes: object[], seasonId: string, tvShowId: string) {
-        await dispatch(showLoadingMain(true, MSG_SAVED_DATA))
+        await dispatch(showLoading(true, MSG_SAVED_DATA))
         await dispatch(registerMyTvShow(episodes, seasonId, tvShowId, () => {
             dispatch(insertMsgs([MSG_NEW_REGISTER_SUCCESS], "success", null, "reload_page"))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }))
     }
 
     async function insertNeverWatch(tvShowIdValue: string, tvShowSeasonIdValue: string, tvShowEpisodeIdValue: string, typeValue: string) {
-        await dispatch(showLoadingMain(true, MSG_REMOVE_REGISTER))
+        await dispatch(showLoading(true, MSG_REMOVE_REGISTER))
         await dispatch(registerNeverWatch(tvShowIdValue, tvShowSeasonIdValue, tvShowEpisodeIdValue, typeValue, () => {
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
             dispatch(insertMsgs([MSG_REMOVE_REGISTER_SUCCESS], "success", null, "reload_page"))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }))
     }
 

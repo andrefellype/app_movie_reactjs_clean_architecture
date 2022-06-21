@@ -8,7 +8,7 @@ const ICON_OBJECT_LIST = {
     EMAIL_ICON: "emailIcon", INSTAGRAM_ICON: "instagramIcon", LOCAL_GROCERY_STORE_ICON: "localGroceryStoreIcon", HOURGLASS_TOP_ICON: "hourglassTopIcon", REMOVE_ICON: "removeIcon", ACCOUNT_BALANCE_ICON: "accountBalanceIcon",
     ACCESS_TIME_FILLED_ICON: "accessTimeFilledIcon", FORMAT_LIST_NUMBERED_ICON: "formatListNumberedIcon", ATTACH_MONEY_ICON: "attachMoneyIcon", HEIGHT_ICON: "heightIcon", ARROW_FORWARD_IOS_ICON: "arrowForwardIosIcon",
     TABLET_MAC_ICON: "tabletMacIcon", LIST_ALT_ICON: "listAltIcon", INBOX_ICON: "inboxIcon", MAIL_ICON: "mailIcon", ARROW_DROP_DOWN_ICON: "arrowDropDownIcon", MOVIE_ICON: "movieIcon",
-    LIVE_TV_ICON: "liveTvIcon", CALENDAR_MONTH_ICON: "calendarMonthIcon", DO_DISTURB_ALT_ICON: "doDisturbAltIcon"
+    LIVE_TV_ICON: "liveTvIcon", CALENDAR_MONTH_ICON: "calendarMonthIcon", DO_DISTURB_ALT_ICON: "doDisturbAltIcon", ACCOUNT_BOX_ICON: "accountBoxIcon"
 }
 
 export default ICON_OBJECT_LIST

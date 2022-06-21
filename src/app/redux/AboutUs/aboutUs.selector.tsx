@@ -1,0 +1,1 @@
+export const getAboutUsSingle = state => state.aboutUsReducer.aboutUs

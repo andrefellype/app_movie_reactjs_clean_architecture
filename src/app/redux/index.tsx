@@ -5,7 +5,7 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import loadingMainReducerClass from "./LoadingMain/loadingMain.reducer"
 import msgAlertReducerClass from "./MsgAlert/msgAlert.reducer"
 import userReducerClass from "./User/user.reducer"
-import appReducerClass from "./App/app.reducer"
+import aboutUsReducerClass from "./AboutUs/aboutUs.reducer"
 import categoryReducerClass from "./Category/category.reducer"
 import directorReducerClass from "./Director/director.reducer"
 import actorReducerClass from "./Actor/actor.reducer"
@@ -24,7 +24,7 @@ const rootReducer = combineReducers({
     loadingMain: loadingMainReducerClass,
     msgAlert: msgAlertReducerClass,
     userReducer: userReducerClass,
-    appReducer: appReducerClass,
+    aboutUsReducer: aboutUsReducerClass,
     categoryReducer: categoryReducerClass,
     directorReducer: directorReducerClass,
     actorReducer: actorReducerClass,

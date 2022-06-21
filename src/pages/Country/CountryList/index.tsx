@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import CountryListView from './view'
 import { CountryListApproved, CountryListBySearch, CountryListDelete, CountryListDeleteBatch } from './actions'
 import { getCountryAll } from '../../../app/redux/Country/country.actions'
@@ -19,10 +19,10 @@ function CountryList() {
     const countriesGeneral = useSelector(getCountriesAll)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCountryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 1, searchText))
     }
 

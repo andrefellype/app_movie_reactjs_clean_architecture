@@ -8,7 +8,7 @@ import { getCategoryAll } from '../../../app/redux/Category/category.actions'
 import { getCategoriesAll, getCategoriesAllFilter } from '../../../app/redux/Category/category.selector'
 import { getCountryAll } from '../../../app/redux/Country/country.actions'
 import { getCountriesAll, getCountriesAllFilter, getCountrySingle } from '../../../app/redux/Country/country.selector'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { getStreamAll } from '../../../app/redux/Stream/stream.actions'
 import { getStreamsAll, getStreamsAllFilter, getStreamSingle } from '../../../app/redux/Stream/stream.selector'
@@ -32,57 +32,57 @@ function TvShowNew() {
     const stream = useSelector(getStreamSingle)
 
     React.useEffect(() => {
-        dispatch(showLoadingMain(true))
+        dispatch(showLoading(true))
         dispatch(getCategoryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, ""))
         dispatch(getCountryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
-        dispatch(getStreamAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListCategory(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, searchText))
         callbackSucess()
     }
 
     async function refreshListCountry(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCountryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListStream(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getStreamAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function insertMovie(titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string) {
-        await dispatch(showLoadingMain(true, MSG_SAVED_DATA))
+        await dispatch(showLoading(true, MSG_SAVED_DATA))
         await dispatch(registerTvShow(titleValue, releaseValue, categoriesValue, countriesValue, streamsValue, resumeValue, () => {
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
             dispatch(insertMsgs([MSG_NEW_REGISTER_SUCCESS], "success", null, "reload_page"))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }))
     }
 

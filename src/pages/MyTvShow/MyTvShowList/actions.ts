@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MSG_DELETE_REGISTER, MSG_DELETE_REGISTER_SUCCESS } from "../../../app/core/consts"
-import { showLoadingMain } from "../../../app/redux/LoadingMain/loadingMain.actions"
+import { showLoading } from "../../../app/redux/LoadingMain/loadingMain.actions"
 import { insertMsgs } from "../../../app/redux/MsgAlert/msgAlert.actions"
-import { deleteMyTvShow, getMyTvShowAll, getMyTvShowAllByOrderAndSearchAndFilter } from "../../../app/redux/MyTvShow/myTvShow.actions"
+import { deleteMyTvShowByTvShowId, getMyTvShowAll, getMyTvShowAllByOrderAndSearchAndFilter } from "../../../app/redux/MyTvShow/myTvShow.actions"
 
 export const MyTvShowListDelete = (tvShowId: string, orderField: string, searchText: string, categoryFilter: string, releaseFilter: string, countryFilter: string) => async dispatch => {
-    await dispatch(showLoadingMain(true, MSG_DELETE_REGISTER))
-    await dispatch(deleteMyTvShow(tvShowId, () => {
-        dispatch(showLoadingMain(true))
+    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(deleteMyTvShowByTvShowId(tvShowId, () => {
+        dispatch(showLoading(true))
         dispatch(getMyTvShowAll(() => {
             dispatch(insertMsgs([MSG_DELETE_REGISTER_SUCCESS], "success"))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, orderField, searchText, categoryFilter, releaseFilter, countryFilter))
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoadingMain(false))
+        dispatch(showLoading(false))
     }))
 }
 

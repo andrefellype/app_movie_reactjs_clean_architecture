@@ -2,7 +2,7 @@
 import React from 'react'
 import { useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import TvShowEpisodeListView from './view'
 import { TvShowEpisodeListBySearch, TvShowEpisodeListDeleteBatch, TvShowEpisodeListDelete, TvShowEpisodeListApproved } from './actions'
 import { getTvShowSingle } from '../../../app/redux/TvShow/tvshow.selector'
@@ -30,10 +30,10 @@ function TvShowEpisodeList() {
 
     async function refreshList(searchText = "") {
         if (typeof tvShowSeasonId !== "undefined" && tvShowSeasonId !== null) {
-            await dispatch(showLoadingMain(true))
-            await dispatch(getTvShowEpisodeAll(tvShowSeasonId, () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+            await dispatch(showLoading(true))
+            await dispatch(getTvShowEpisodeAll(tvShowSeasonId, () => dispatch(showLoading(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, searchText))
         }
     }
@@ -60,17 +60,17 @@ function TvShowEpisodeList() {
 
     React.useEffect(() => {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            dispatch(showLoadingMain(true))
-            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+            dispatch(showLoading(true))
+            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
         }
         if (typeof tvShowSeasonId !== "undefined" && tvShowSeasonId !== null) {
-            dispatch(showLoadingMain(true))
-            dispatch(openTvShowSeasonById(tvShowSeasonId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+            dispatch(showLoading(true))
+            dispatch(openTvShowSeasonById(tvShowSeasonId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
         }
         // eslint-disable-next-line

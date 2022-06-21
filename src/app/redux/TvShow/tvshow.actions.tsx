@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { TOKEN_LOCAL_STORAGE, TV_SHOW_LIST_FILTER_REDUCER, TV_SHOW_LIST_REDUCER, TV_SHOW_SINGLE_REDUCER } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralTvShow = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralTvShowByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("tvshow/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
@@ -18,7 +18,7 @@ export const deleteSeveralTvShow = (_ids: string[], callbackSuccess: () => void,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteTvShow = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteTvShowById = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("tvshow/delete", { tvShowId: tvShowIdValue }).then(response => {
@@ -33,7 +33,7 @@ export const deleteTvShow = (tvShowIdValue: string, callbackSuccess: () => void,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedReviewedTvShow = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const approvedReviewedTvShowById = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("tvshow/approved/reviewed", { tvShowId: tvShowIdValue }).then(response => {
@@ -48,7 +48,7 @@ export const approvedReviewedTvShow = (tvShowIdValue: string, callbackSuccess: (
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateTvShow = (tvShowIdValue: string, titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateTvShowById = (tvShowIdValue: string, titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const objectData = {
         tvShowId: tvShowIdValue, title: titleValue, release: releaseValue, categories: categoriesValue, countries: countriesValue, streams: streamsValue, resume: resumeValue
     }

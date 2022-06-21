@@ -2,7 +2,7 @@
 import React from 'react'
 import { useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import TvShowSeasonListView from './view'
 import { TvShowSeasonListBySearch, TvShowSeasonListDeleteBatch, TvShowSeasonListDelete, TvShowSeasonListApproved } from './actions'
 import { getTvShowSingle } from '../../../app/redux/TvShow/tvshow.selector'
@@ -27,19 +27,19 @@ function TvShowSeasonList() {
 
     async function refreshList(searchText = "") {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            await dispatch(showLoadingMain(true))
-            await dispatch(getTvShowSeasonAll(tvShowId, () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+            await dispatch(showLoading(true))
+            await dispatch(getTvShowSeasonAll(tvShowId, () => dispatch(showLoading(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, searchText))
         }
     }
 
     React.useEffect(() => {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
         }
         // eslint-disable-next-line

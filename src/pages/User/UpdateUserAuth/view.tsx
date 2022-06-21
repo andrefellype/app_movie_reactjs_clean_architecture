@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const UpdateUserProfileView: React.FC<{ getUser: any, update: any }> = function ({ getUser, update }) {
+const UpdateUserAuthView: React.FC<{ getUser: any, update: any }> = function ({ getUser, update }) {
 
     const classes = useStyles()
 
@@ -38,7 +38,7 @@ const UpdateUserProfileView: React.FC<{ getUser: any, update: any }> = function 
     }, [getUser])
 
     return (
-        <PageCard title="EDITAR PERFIL" sizeMd={9} sizeXs={12}>
+        <PageCard title="EDITAR DADOS DO MEU USUÁRIO" sizeMd={9} sizeXs={12}>
             <Grid container spacing={2}>
                 <Grid item md={9} xs={12}>
                     <Card>
@@ -68,4 +68,4 @@ const UpdateUserProfileView: React.FC<{ getUser: any, update: any }> = function 
     )
 }
 
-export default UpdateUserProfileView
+export default UpdateUserAuthView

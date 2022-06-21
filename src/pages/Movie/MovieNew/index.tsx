@@ -10,7 +10,7 @@ import { getCountryAll } from '../../../app/redux/Country/country.actions'
 import { getCountriesAll, getCountriesAllFilter, getCountrySingle } from '../../../app/redux/Country/country.selector'
 import { getDirectorAll } from '../../../app/redux/Director/director.actions'
 import { getDirectorsAll, getDirectorsAllFilter, getDirectorSingle } from '../../../app/redux/Director/director.selector'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { registerMovie } from '../../../app/redux/Movie/movie.actions'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { getStreamAll } from '../../../app/redux/Stream/stream.actions'
@@ -42,85 +42,85 @@ function MovieNew() {
     const stream = useSelector(getStreamSingle)
 
     React.useEffect(() => {
-        dispatch(showLoadingMain(true))
+        dispatch(showLoading(true))
         dispatch(getActorAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
         dispatch(getDirectorAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
         dispatch(getCategoryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, ""))
         dispatch(getCountryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
-        dispatch(getStreamAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, ""))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListDirector(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getDirectorAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListCast(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getActorAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getActorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListCategory(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, searchText))
         callbackSucess()
     }
 
     async function refreshListCountry(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCountryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListStream(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getStreamAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function insertMovie(titleValue: string, releaseValue: string, directorsValue: [], castsValue: [], durationValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], movieTheaterValue: string, resumeValue: string) {
-        await dispatch(showLoadingMain(true, MSG_SAVED_DATA))
+        await dispatch(showLoading(true, MSG_SAVED_DATA))
         await dispatch(registerMovie(
             titleValue, releaseValue, directorsValue, castsValue, durationValue,
             categoriesValue, countriesValue, streamsValue, movieTheaterValue, resumeValue, () => {
                 dispatch(insertMsgs([MSG_NEW_REGISTER_SUCCESS], "success", null, "reload_page"))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
     }
 

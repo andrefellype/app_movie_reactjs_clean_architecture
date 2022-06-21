@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import DirectorListView from './view'
 import { getDirectorAll } from '../../../app/redux/Director/director.actions'
 import { getDirectorsAll, getDirectorsAllFilter } from '../../../app/redux/Director/director.selector'
@@ -19,10 +19,10 @@ function DirectorList() {
     const directorsGeneral = useSelector(getDirectorsAll)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getDirectorAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 1, searchText))
     }
 

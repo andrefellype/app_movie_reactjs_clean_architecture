@@ -2,13 +2,13 @@
 import React from 'react'
 import { useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { MSG_SAVED_DATA, MSG_UPDATE_REGISTER_SUCCESS } from '../../../app/core/consts'
 import { getCategoriesAll, getCategoriesAllFilter } from '../../../app/redux/Category/category.selector'
 import { getCategoryAll } from '../../../app/redux/Category/category.actions'
 import MovieEditView from './view'
 import { getMovieSingle } from '../../../app/redux/Movie/movie.selector'
-import { openMovieById, updateMovie } from '../../../app/redux/Movie/movie.actions'
+import { openMovieById, updateMovieById } from '../../../app/redux/Movie/movie.actions'
 import { MovieEditActorOpenById, MovieEditCastBySearch, MovieEditCastDeleteActor, MovieEditCastInsertActor, MovieEditCastUpdateActor, MovieEditCategoryBySearch, MovieEditCountryBySearch, MovieEditCountryDelete, MovieEditCountryInsert, MovieEditCountryOpenById, MovieEditCountryUpdate, MovieEditDirectorBySearch, MovieEditDirectorDelete, MovieEditDirectorInsert, MovieEditDirectorOpenById, MovieEditDirectorUpdate, MovieEditStreamBySearch, MovieEditStreamDelete, MovieEditStreamInsert, MovieEditStreamOpenById, MovieEditStreamUpdate } from './actions'
 import { getDirectorAll } from '../../../app/redux/Director/director.actions'
 import { getDirectorsAll, getDirectorsAllFilter, getDirectorSingle } from '../../../app/redux/Director/director.selector'
@@ -49,89 +49,89 @@ function MovieEdit() {
 
     React.useEffect(() => {
         if (typeof movieId !== "undefined" && movieId !== null) {
-            dispatch(showLoadingMain(true))
+            dispatch(showLoading(true))
             dispatch(getActorAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, 0, ""))
             dispatch(getDirectorAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, 0, ""))
             dispatch(getCategoryAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, ""))
             dispatch(getCountryAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, 0, ""))
             dispatch(getStreamAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }, 0, ""))
-            dispatch(openMovieById(movieId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
+            dispatch(openMovieById(movieId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListDirector(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getDirectorAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListCast(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getActorAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getActorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListCategory(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, searchText))
         callbackSucess()
     }
 
     async function refreshListCountry(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCountryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListStream(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getStreamAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function updateRegister(titleValue: string, releaseValue: string, directorsValue: [], castsValue: [], durationValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], movieTheaterValue: string, resumeValue: string) {
         if (typeof movieId !== "undefined" && movieId !== null) {
-            await dispatch(showLoadingMain(true, MSG_SAVED_DATA))
-            await dispatch(updateMovie(movieId, titleValue, releaseValue, directorsValue, castsValue, durationValue, categoriesValue, countriesValue, streamsValue, movieTheaterValue, resumeValue, () => {
-                dispatch(showLoadingMain(false))
+            await dispatch(showLoading(true, MSG_SAVED_DATA))
+            await dispatch(updateMovieById(movieId, titleValue, releaseValue, directorsValue, castsValue, durationValue, categoriesValue, countriesValue, streamsValue, movieTheaterValue, resumeValue, () => {
+                dispatch(showLoading(false))
                 dispatch(insertMsgs([MSG_UPDATE_REGISTER_SUCCESS], "success", null, "reload_page"))
             }, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
             }))
         }
     }

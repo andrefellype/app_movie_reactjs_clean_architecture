@@ -3,14 +3,14 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 import { getUserSingle } from '../../../app/redux/User/user.selector'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
-import { openUserById, updatePassword } from '../../../app/redux/User/user.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { openUserById, updatePasswordById } from '../../../app/redux/User/user.actions'
 import { MSG_SAVED_DATA, MSG_UPDATE_PASSWORD_SUCCESS, URL_PANEL_HOME, USER_LOCAL_STORAGE } from '../../../app/core/consts'
 import CryptographyConvert from '../../../app/components/CryptographyConvert'
-import UserEditPasswordView from './view'
+import UpdateUserPasswordView from './view'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 
-function UserEditPassword() {
+function UpdateUserPassword() {
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -43,9 +43,9 @@ function UserEditPassword() {
 
     React.useEffect(() => {
         if (userId !== null && typeof userId !== "undefined") {
-            dispatch(showLoadingMain(true))
-            dispatch(openUserById(userId.toString(), () => dispatch(showLoadingMain(false)), (errorsMsg) => {
-                dispatch(showLoadingMain(false))
+            dispatch(showLoading(true))
+            dispatch(openUserById(userId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
+                dispatch(showLoading(false))
                 dispatch(insertMsgs(errorsMsg, 'error'))
             }, (userActual) => verifyLevelUser(userActual)))
         }
@@ -54,20 +54,20 @@ function UserEditPassword() {
 
     async function updateUser(passwordField: string, confirmPasswordField: string) {
         if (userId !== null && typeof userId !== "undefined") {
-            await dispatch(showLoadingMain(true, MSG_SAVED_DATA))
-            await dispatch(updatePassword(userId.toString(), passwordField, confirmPasswordField, () => {
-                dispatch(showLoadingMain(false))
+            await dispatch(showLoading(true, MSG_SAVED_DATA))
+            await dispatch(updatePasswordById(userId.toString(), passwordField, confirmPasswordField, () => {
+                dispatch(showLoading(false))
                 dispatch(insertMsgs([MSG_UPDATE_PASSWORD_SUCCESS], "success", null, "reload_page"))
             }, (errorMsg) => {
-                dispatch(showLoadingMain(false))
+                dispatch(showLoading(false))
                 dispatch(insertMsgs(errorMsg, 'error'))
             }))
         }
     }
 
     return (
-        <UserEditPasswordView getUser={getUser} update={(passwordField: string, confirmPasswordField: string) => updateUser(passwordField, confirmPasswordField)} />
+        <UpdateUserPasswordView getUser={getUser} update={(passwordField: string, confirmPasswordField: string) => updateUser(passwordField, confirmPasswordField)} />
     )
 }
 
-export default UserEditPassword
+export default UpdateUserPassword

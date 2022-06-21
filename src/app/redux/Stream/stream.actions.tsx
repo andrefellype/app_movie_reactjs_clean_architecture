@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { STREAM_LIST_FILTER_REDUCER, STREAM_LIST_REDUCER, STREAM_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralStream = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralStreamByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("stream/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
@@ -18,7 +18,7 @@ export const deleteSeveralStream = (_ids: string[], callbackSuccess: () => void,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteStream = (streamIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteStreamById = (streamIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("stream/delete", { streamId: streamIdValue }).then(response => {
@@ -33,7 +33,7 @@ export const deleteStream = (streamIdValue: string, callbackSuccess: () => void,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedReviewedStream = (streamIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const approvedReviewedStreamById = (streamIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("stream/approved/reviewed", { streamId: streamIdValue }).then(response => {
@@ -48,7 +48,7 @@ export const approvedReviewedStream = (streamIdValue: string, callbackSuccess: (
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateStream = (streamIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateStreamById = (streamIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const objectData = { streamId: streamIdValue, name: nameValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token

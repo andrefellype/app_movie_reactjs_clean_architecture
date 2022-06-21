@@ -3,7 +3,7 @@ import api from "../../core/api"
 import { CATEGORY_LIST_FILTER_REDUCER, CATEGORY_LIST_REDUCER, CATEGORY_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateCategory = (categoryIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateCategoryById = (categoryIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const objectData = { categoryId: categoryIdValue, name: nameValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
@@ -51,7 +51,7 @@ export const registerCategory = (nameValue: string, callbackSuccess: () => void,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralCategory = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralCategoryByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("category/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
@@ -66,7 +66,7 @@ export const deleteSeveralCategory = (_ids: string[], callbackSuccess: () => voi
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteCategory = (categoryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const deleteCategoryById = (categoryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("category/delete", { categoryId: categoryIdValue }).then(response => {

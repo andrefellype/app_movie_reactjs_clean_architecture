@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
 import { getActorAll } from '../../../app/redux/Actor/actor.actions'
 import { getActorsAll, getActorsAllFilter } from '../../../app/redux/Actor/actor.selector'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { ActorListApproved, ActorListBySearch, ActorListDelete, ActorListDeleteBatch } from './actions'
 import ActorListView from './view'
@@ -19,9 +19,9 @@ function ActorList() {
     const actorsGeneral = useSelector(getActorsAll)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getActorAll(() => dispatch(showLoadingMain(false)), (errorMsg) => {
-            dispatch(showLoadingMain(false))
+        await dispatch(showLoading(true))
+        await dispatch(getActorAll(() => dispatch(showLoading(false)), (errorMsg) => {
+            dispatch(showLoading(false))
             dispatch(insertMsgs(errorMsg, 'error'))
         }, 1, searchText))
     }

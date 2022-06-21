@@ -5,7 +5,7 @@ import api from "../../core/api"
 import { TOKEN_LOCAL_STORAGE, URL_FAIL_PAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER, USER_LOCAL_STORAGE, USER_SINGLE_REDUCER } from "../../core/consts"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updatePassword = (userIdValue: string, passwordValue: string, confirmPassword: string, callbackSuccess: () => void, callbackError: (errorMsg) => void) => async dispatch => {
+export const updatePasswordById = (userIdValue: string, passwordValue: string, confirmPassword: string, callbackSuccess: () => void, callbackError: (errorMsg) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     const objectData = { userId: userIdValue, password: passwordValue, password_confirm: confirmPassword }
@@ -59,7 +59,7 @@ export const registerUser = (nameValue: string, birthValue: string, emailValue: 
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralUser = (_ids: string[], callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
+export const deleteSeveralUserByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("user/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
@@ -74,7 +74,7 @@ export const deleteSeveralUser = (_ids: string[], callbackSuccess: () => void, c
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteUser = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
+export const deleteUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("user/delete", { userId: userIdValue }).then(response => {
@@ -89,7 +89,7 @@ export const deleteUser = (userIdValue: string, callbackSuccess: () => void, cal
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateEnabledRegister = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateEnabledUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("user/update/enabled", { userId: userIdValue }).then(response => {
@@ -192,7 +192,7 @@ export const getUserAll = (callbackSuccess: () => void, callbackError: (errorsMs
     })
 }
 
-export const updatePasswordAuth = (passwordValue: string, confirmPasswordValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updatePasswordUserByToken = (passwordValue: string, confirmPasswordValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const objectData = { password: passwordValue, password_confirm: confirmPasswordValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
@@ -219,7 +219,7 @@ export const updatePasswordAuth = (passwordValue: string, confirmPasswordValue: 
     })
 }
 
-export const updateAuth = (nameValue: string, birthValue: string, emailValue: string, cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateUserByToken = (nameValue: string, birthValue: string, emailValue: string, cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
     const birthEUA = birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
 
@@ -254,7 +254,7 @@ export const updateAuth = (nameValue: string, birthValue: string, emailValue: st
     })
 }
 
-export const openByToken = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const openUserByToken = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.get("user/open/token").then(response => {
@@ -282,7 +282,7 @@ export const updatePasswordUserByCodeRecovery = async (codeValue: string, passwo
     })
 }
 
-export const openUserByCodeRecoveryPassword = (codeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[] | string) => void) => async dispatch => {
+export const openUserByCodeRecovery = (codeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[] | string) => void) => async dispatch => {
     const objectData = { code: codeValue }
     await api.post("user/open/coderecovery", objectData).then(response => {
         if (response.data.status) {
@@ -300,7 +300,7 @@ export const openUserByCodeRecoveryPassword = (codeValue: string, callbackSucces
     })
 }
 
-export const recoveryUserPassword = async (cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => {
+export const recoveryPasswordUser = async (cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => {
     const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
     const objectData = { cellphone: cellphoneNumber }
     await api.post("user/recovery/password", objectData).then(response => {
@@ -315,7 +315,7 @@ export const recoveryUserPassword = async (cellphoneValue: string, callbackSucce
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const isVerifyUser = (callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const isVerifyUserAndToken = (callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     if (window.location.pathname.indexOf(URL_FAIL_PAGE) === -1) {
         const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
         if (token !== null) {
@@ -363,8 +363,10 @@ export const signOutUser = () => async dispatch => {
 export const signUpUser = (nameValue: string, birthValue: string, cellphoneValue: string, emailValue: string, passwordValue: string, confirmPasswordValue: string, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
     const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
     const birthEUA = birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
+
     const objectData = { name: nameValue, birth: birthEUA, cellphone: cellphoneNumber, email: emailValue, password: passwordValue, password_confirm: confirmPasswordValue }
-    await api.post("user/register/main", objectData).then(async response => {
+
+    await api.post("user/signup", objectData).then(async response => {
         if (response.data.status) {
             const dataApi = response.data.data
             localStorage.setItem(USER_LOCAL_STORAGE, CryptographyConvert("base64", JSON.stringify(dataApi), "encode"))

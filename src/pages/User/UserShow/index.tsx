@@ -3,7 +3,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 import { getUserSingle } from '../../../app/redux/User/user.selector'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import { URL_USERS, USER_LOCAL_STORAGE } from '../../../app/core/consts'
 import { openUserById } from '../../../app/redux/User/user.actions'
 import CryptographyConvert from '../../../app/components/CryptographyConvert'
@@ -35,9 +35,9 @@ function UserShow() {
     React.useEffect(() => {
         verifyIdUser().then(statusVerify => {
             if (statusVerify) {
-                dispatch(showLoadingMain(true))
-                dispatch(openUserById(userId as string, () => dispatch(showLoadingMain(false)), (errorsMsg) => {
-                    dispatch(showLoadingMain(false))
+                dispatch(showLoading(true))
+                dispatch(openUserById(userId as string, () => dispatch(showLoading(false)), (errorsMsg) => {
+                    dispatch(showLoading(false))
                     dispatch(insertMsgs(errorsMsg, 'error'))
                 }))
             } else {

@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MSG_DELETE_REGISTER, MSG_DELETE_REGISTERS_SUCCESS, MSG_DELETE_REGISTER_SUCCESS, MSG_UPDATED_REGISTER, MSG_UPDATE_REGISTER_SUCCESS } from "../../../app/core/consts"
-import { showLoadingMain } from "../../../app/redux/LoadingMain/loadingMain.actions"
+import { showLoading } from "../../../app/redux/LoadingMain/loadingMain.actions"
 import { insertMsgs } from "../../../app/redux/MsgAlert/msgAlert.actions"
-import { approvedReviewedStream, deleteSeveralStream, deleteStream, getStreamAll, getStreamAllBySearch } from "../../../app/redux/Stream/stream.actions"
+import { approvedReviewedStreamById, deleteSeveralStreamByIds, deleteStreamById, getStreamAll, getStreamAllBySearch } from "../../../app/redux/Stream/stream.actions"
 
 export const StreamListDelete = (streamId: string, searchText: string) => async dispatch => {
-    await dispatch(showLoadingMain(true, MSG_DELETE_REGISTER))
-    await dispatch(deleteStream(streamId.toString(), () => {
-        dispatch(showLoadingMain(true))
+    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(deleteStreamById(streamId.toString(), () => {
+        dispatch(showLoading(true))
         dispatch(getStreamAll(() => {
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
             dispatch(insertMsgs([MSG_DELETE_REGISTER_SUCCESS], "success"))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 1, searchText))
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoadingMain(false))
+        dispatch(showLoading(false))
     }))
 }
 
@@ -26,36 +26,36 @@ export const StreamListBySearch = (searchText: string, streamsGeneral) => async 
 }
 
 export const StreamListDeleteBatch = (arrayDeleteBatch: any, searchText: string, dispatchEraseBatch: any) => async dispatch => {
-    await dispatch(showLoadingMain(true, MSG_DELETE_REGISTER))
-    await dispatch(deleteSeveralStream(arrayDeleteBatch, () => {
+    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(deleteSeveralStreamByIds(arrayDeleteBatch, () => {
         dispatchEraseBatch()
-        dispatch(showLoadingMain(true))
+        dispatch(showLoading(true))
         dispatch(getStreamAll(() => {
             dispatch(insertMsgs([MSG_DELETE_REGISTERS_SUCCESS], "success"))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 1, searchText))
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoadingMain(false))
+        dispatch(showLoading(false))
     }))
 }
 
 export const StreamListApproved = (streamId: string, searchText: string) => async dispatch => {
-    await dispatch(showLoadingMain(true, MSG_UPDATED_REGISTER))
-    await dispatch(approvedReviewedStream(streamId.toString(), () => {
-        dispatch(showLoadingMain(true))
+    await dispatch(showLoading(true, MSG_UPDATED_REGISTER))
+    await dispatch(approvedReviewedStreamById(streamId.toString(), () => {
+        dispatch(showLoading(true))
         dispatch(getStreamAll(() => {
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
             dispatch(insertMsgs([MSG_UPDATE_REGISTER_SUCCESS], "success"))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, 1, searchText))
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoadingMain(false))
+        dispatch(showLoading(false))
     }))
 }

@@ -55,6 +55,7 @@ import MovieIcon from '@mui/icons-material/Movie'
 import LiveTvIcon from '@mui/icons-material/LiveTv'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import DoDisturbAltIcon from '@mui/icons-material/DoDisturbAlt'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import ICON_OBJECT_LIST from './ICON_OBJECT_LIST'
 
 export default class IconList extends React.Component<{ icon: string, sizeIcon?: 'inherit' | 'large' | 'medium' | 'small', style?: object }> {
@@ -65,6 +66,8 @@ export default class IconList extends React.Component<{ icon: string, sizeIcon?:
             case "":
             case null:
                 return null
+            case ICON_OBJECT_LIST.ACCOUNT_BOX_ICON:
+                return <AccountBoxIcon fontSize={sizeIcon} {...other} />
             case ICON_OBJECT_LIST.DO_DISTURB_ALT_ICON:
                 return <DoDisturbAltIcon fontSize={sizeIcon} {...other} />
             case ICON_OBJECT_LIST.CALENDAR_MONTH_ICON:

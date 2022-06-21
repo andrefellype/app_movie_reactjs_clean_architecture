@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoadingMain } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
 import CategoryListView from './view'
 import { getCategoriesAll, getCategoriesAllFilter } from '../../../app/redux/Category/category.selector'
 import { getCategoryAll } from '../../../app/redux/Category/category.actions'
@@ -19,10 +19,10 @@ function CategoryList() {
     const categoriesGeneral = useSelector(getCategoriesAll)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoadingMain(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoadingMain(false)), (errorsMsg) => {
+        await dispatch(showLoading(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoadingMain(false))
+            dispatch(showLoading(false))
         }, searchText))
     }
 

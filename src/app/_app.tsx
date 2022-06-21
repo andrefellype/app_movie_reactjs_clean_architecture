@@ -15,30 +15,30 @@ import FailPage from '../pages/App/FailPage'
 import { getMsgAlert } from './redux/MsgAlert/msgAlert.selector'
 import { statusLoadingMain } from './redux/LoadingMain/loadingMain.selector'
 import { cleanMsgs, insertMsgs } from './redux/MsgAlert/msgAlert.actions'
-import { showLoadingMain } from './redux/LoadingMain/loadingMain.actions'
+import { showLoading } from './redux/LoadingMain/loadingMain.actions'
 import {
-    MSG_LOGOUT_SYSTEM, MSG_LOGOUT_SYSTEM_ACTION, SYSTEM_API_VERSION, URL_ABOUT, URL_ABOUT_EDIT, URL_ABOUT_NEW, URL_ACTORS, URL_ACTOR_EDIT, URL_ACTOR_NEW,
+    MSG_LOGOUT_SYSTEM, MSG_LOGOUT_SYSTEM_ACTION, SYSTEM_API_VERSION, URL_ABOUT_US, URL_ABOUT_US_EDIT, URL_ABOUT_US_NEW, URL_ACTORS, URL_ACTOR_EDIT, URL_ACTOR_NEW,
     URL_CATEGORIES, URL_CATEGORY_EDIT, URL_CATEGORY_NEW, URL_COUNTRIES, URL_COUNTRY_EDIT, URL_COUNTRY_NEW, URL_DIRECTORS, URL_DIRECTOR_EDIT, URL_DIRECTOR_NEW,
     URL_FAIL_PAGE, URL_FORGOT_PASSWORD, URL_MAIN, URL_MOVIES, URL_MOVIE_EDIT, URL_MOVIE_NEW, URL_MY_MOVIES, URL_MY_MOVIE_NEW, URL_MY_TV_SHOWS, URL_MY_TV_SHOW_NEW, URL_PANEL_HOME, URL_RECOVERY_PASSWORD,
     URL_SIGN_IN, URL_SIGN_UP, URL_STREAMS, URL_STREAM_EDIT, URL_STREAM_NEW, URL_TV_SHOWS, URL_TV_SHOW_EDIT, URL_TV_SHOW_EPISODES, URL_TV_SHOW_EPISODE_EDIT,
     URL_TV_SHOW_EPISODE_NEW, URL_TV_SHOW_NEW, URL_TV_SHOW_SEASONS, URL_TV_SHOW_SEASON_EDIT, URL_TV_SHOW_SEASON_NEW, URL_UNDER_CONSTRUCTION, URL_USERS, URL_USER_NEW,
-    URL_USER_PROFILE, URL_USER_PROFILE_PASSWORD, URL_USER_UPDATE_PASSWORD
+    URL_USER_AUTH, URL_USER_AUTH_PASSWORD, URL_USER_UPDATE_PASSWORD
 } from './core/consts'
 import SignUp from '../pages/User/SignUp'
 import { getUserAccess } from './redux/User/user.selector'
-import { isVerifyUser, signOutUser } from './redux/User/user.actions'
+import { isVerifyUserAndToken, signOutUser } from './redux/User/user.actions'
 import SignIn from '../pages/User/SignIn'
 import ForgotPassword from '../pages/User/ForgotPassword'
 import RecoveryPassword from '../pages/User/RecoveryPassword'
-import UpdateUserProfile from '../pages/User/UpdateUserProfile'
-import UpdateUserProfilePassword from '../pages/User/UpdateUserProfilePassword'
+import UpdateUserAuth from '../pages/User/UpdateUserAuth'
+import UpdateUserAuthPassword from '../pages/User/UpdateUserAuthPassword'
 import UserList from '../pages/User/UserList'
 import UserNew from '../pages/User/UserNew'
 import UserShow from '../pages/User/UserShow'
-import UserEditPassword from '../pages/User/UserEditPassword'
-import AboutApp from '../pages/App/AboutApp'
-import AboutAppNew from '../pages/App/AboutAppNew'
-import AboutAppEdit from '../pages/App/AboutAppEdit'
+import UpdateUserPassword from '../pages/User/UpdateUserPassword'
+import AboutUsShow from '../pages/AboutUs/AboutUsShow'
+import AboutUsNew from '../pages/AboutUs/AboutUsNew'
+import AboutUsEdit from '../pages/AboutUs/AboutUsEdit'
 import CategoryList from '../pages/Category/CategoryList'
 import CategoryNew from '../pages/Category/CategoryNew'
 import CategoryEdit from '../pages/Category/CategoryEdit'
@@ -92,7 +92,7 @@ function App() {
     }
 
     React.useEffect(() => {
-        dispatch(isVerifyUser((errorsMsg) => dispatch(insertMsgs(errorsMsg, 'error'))))
+        dispatch(isVerifyUserAndToken((errorsMsg) => dispatch(insertMsgs(errorsMsg, 'error'))))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -110,7 +110,7 @@ function App() {
         { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.LIVE_TV_ICON, title: "SÉRIES", isDesktop: true, isMobile: true, redirectUrl: URL_TV_SHOWS } },
         { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.MOVIE_ICON, title: "MEUS FILMES", isDesktop: true, isMobile: true, redirectUrl: URL_MY_MOVIES } },
         { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.LIVE_TV_ICON, title: "MINHAS SÉRIES", isDesktop: true, isMobile: true, redirectUrl: URL_MY_TV_SHOWS } },
-        { checkUser: -1, menu: { icon: ICON_OBJECT_LIST.INFO_ICON, title: "SOBRE NÓS", isDesktop: true, isMobile: true, redirectUrl: URL_ABOUT } },
+        { checkUser: -1, menu: { icon: ICON_OBJECT_LIST.INFO_ICON, title: "SOBRE NÓS", isDesktop: true, isMobile: true, redirectUrl: URL_ABOUT_US } },
     ]
 
     function verifyUser(checkUser: number, checkLevels: string[] = [], notLevels: string[] = []) {
@@ -136,8 +136,8 @@ function App() {
 
     const menusHeader: { checkUser: number, checkLevels?: string[], notLevels?: string[], menu: HeaderMenu }[] = [
         { checkUser: 0, menu: { icon: ICON_OBJECT_LIST.ACCOUNT_CIRCLE_ICON, redirectUrl: URL_SIGN_IN, isDesktop: false, isMobile: true } },
-        { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.VPN_KEY_ICON, redirectUrl: URL_USER_PROFILE_PASSWORD, isDesktop: true, isMobile: true } },
-        { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.ACCOUNT_CIRCLE_ICON, redirectUrl: URL_USER_PROFILE, isDesktop: true, isMobile: true } },
+        { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.VPN_KEY_ICON, redirectUrl: URL_USER_AUTH_PASSWORD, isDesktop: true, isMobile: true } },
+        { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.ACCOUNT_CIRCLE_ICON, redirectUrl: URL_USER_AUTH, isDesktop: true, isMobile: true } },
         { checkUser: 1, menu: { icon: ICON_OBJECT_LIST.EXIT_TO_APP_ICON, clickOut: () => setShowLogout(true), isDesktop: true, isMobile: true } },
     ]
 
@@ -173,16 +173,16 @@ function App() {
                 { path: URL_SIGN_IN, element: verifyUserComponent(<SignIn />, 0) },
                 { path: URL_FORGOT_PASSWORD, element: verifyUserComponent(<ForgotPassword />, 0) },
                 { path: `${URL_RECOVERY_PASSWORD}/:codeRecovery`, element: verifyUserComponent(<RecoveryPassword />, 0) },
-                { path: URL_USER_PROFILE, element: verifyUserComponent(<UpdateUserProfile />, 1) },
-                { path: URL_USER_PROFILE_PASSWORD, element: verifyUserComponent(<UpdateUserProfilePassword />, 1) },
+                { path: URL_USER_AUTH, element: verifyUserComponent(<UpdateUserAuth />, 1) },
+                { path: URL_USER_AUTH_PASSWORD, element: verifyUserComponent(<UpdateUserAuthPassword />, 1) },
                 { path: URL_USERS, element: verifyUserComponent(<UserList />, 1, ['ADMIN']) },
                 { path: URL_USER_NEW, element: verifyUserComponent(<UserNew />, 1, ['ADMIN']) },
                 { path: `${URL_USERS}/:userId`, element: verifyUserComponent(<UserShow />, 1, ['ADMIN']) },
-                { path: `${URL_USER_UPDATE_PASSWORD}/:userId`, element: verifyUserComponent(<UserEditPassword />, 1, ['ADMIN']) },
+                { path: `${URL_USER_UPDATE_PASSWORD}/:userId`, element: verifyUserComponent(<UpdateUserPassword />, 1, ['ADMIN']) },
 
-                { path: URL_ABOUT, element: verifyUserComponent(<AboutApp />, -1) },
-                { path: URL_ABOUT_NEW, element: verifyUserComponent(<AboutAppNew />, 1, ['ADMIN']) },
-                { path: URL_ABOUT_EDIT, element: verifyUserComponent(<AboutAppEdit />, 1, ['ADMIN']) },
+                { path: URL_ABOUT_US, element: verifyUserComponent(<AboutUsShow />, -1) },
+                { path: URL_ABOUT_US_NEW, element: verifyUserComponent(<AboutUsNew />, 1, ['ADMIN']) },
+                { path: URL_ABOUT_US_EDIT, element: verifyUserComponent(<AboutUsEdit />, 1, ['ADMIN']) },
 
                 { path: URL_CATEGORIES, element: verifyUserComponent(<CategoryList />, 1, ['ADMIN']) },
                 { path: URL_CATEGORY_NEW, element: verifyUserComponent(<CategoryNew />, 1, ['ADMIN']) },
@@ -234,7 +234,7 @@ function App() {
 
     async function logoutSystem() {
         setShowLogout(false)
-        dispatch(showLoadingMain(true, MSG_LOGOUT_SYSTEM_ACTION))
+        dispatch(showLoading(true, MSG_LOGOUT_SYSTEM_ACTION))
         dispatch(signOutUser())
     }
 
