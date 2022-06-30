@@ -6,7 +6,7 @@ import ButtonDanger from '../Button/ButtonDanger'
 
 import IconList from '../IconList'
 
-export type DialogListModel = { text: string | string[], icon?: string, cursorClick?: "pointer" | null, actionClick?: () => void }
+export type DialogListModel = { text: string | string[], icon?: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }
 
 export default class DialogList extends React.Component<{
     showDialog: boolean, onCloseDialog?: () => void, clickCloseDialog?: () => void, listDialog: DialogListModel[], style?: object

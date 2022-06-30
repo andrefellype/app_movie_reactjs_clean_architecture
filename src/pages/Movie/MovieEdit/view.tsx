@@ -167,14 +167,14 @@ const MovieEditView: React.FC<{
     categories: any, actionRefreshListCategory: any, actionChangeSearchCategory: any,
     actors: any, actor: any, actionChangeSearchCast: any, actionInsertRegisterActor: any, actionUpdateRegisterActor: any, actionRefreshListCast: any, openActor: any, actionDeleteRegisterActor: any,
     directors: any, director: any, actionChangeSearchDirector: any, actionInsertRegisterDirector: any, actionUpdateRegisterDirector: any, actionRefreshListDirector: any, openDirector: any, actionDeleteRegisterDirector: any,
-    getMovie: any, update: any
+    getMovie: any, isLoading: boolean, update: any
 }> = function ({
     streams, stream, actionChangeSearchStream, actionRefreshListStream, actionInsertRegisterStream, actionUpdateRegisterStream, actionDeleteRegisterStream, openStream,
     countries, country, actionChangeSearchCountry, actionRefreshListCountry, actionInsertRegisterCountry, actionUpdateRegisterCountry, actionDeleteRegisterCountry, openCountry,
     categories, actionRefreshListCategory, actionChangeSearchCategory,
     actors, actor, actionChangeSearchCast, actionInsertRegisterActor, actionUpdateRegisterActor, actionRefreshListCast, openActor, actionDeleteRegisterActor,
     directors, director, actionChangeSearchDirector, actionRefreshListDirector, actionInsertRegisterDirector, actionUpdateRegisterDirector, openDirector, actionDeleteRegisterDirector,
-    getMovie, update
+    getMovie, isLoading, update
 }) {
         const classes = useStyles()
         const navigate = useNavigate()
@@ -331,7 +331,7 @@ const MovieEditView: React.FC<{
                 })
                 dispatchCountry({
                     type: "replace", newCountries: getMovie.countries.map(countryV => {
-                        return { _id: countryV._id, name: countryV.name }
+                        return { _id: countryV._id, name: countryV.initial }
                     })
                 })
                 dispatchStream({
@@ -377,7 +377,7 @@ const MovieEditView: React.FC<{
 
         React.useEffect(() => {
             if (country) {
-                setIdCountryEditName(country.name)
+                setIdCountryEditName(country.initial)
             }
         }, [country])
 
@@ -421,27 +421,31 @@ const MovieEditView: React.FC<{
 
         function updateRegisterDirector() {
             const idDirector = idDirectorEdit
-            if (idDirector.length > 0) {
-                setIdDirectorEdit("")
-                setShowDirector(false)
-                if (idDirector === "0") {
-                    actionInsertRegisterDirector(idDirectorEditName, searchTextDirector, () => {
-                        setIdDirectorEditName("")
-                        setIdDirectorEdit("")
-                        setShowDirector(true)
-                    }, () => {
-                        setShowDirector(true)
-                        setIdDirectorEdit(idDirector)
-                    })
-                } else {
-                    actionUpdateRegisterDirector(idDirector, idDirectorEditName, searchTextDirector, () => {
-                        dispatchDirector({ type: 'replaceName', _id: idDirector, name: idDirectorEditName })
-                        setIdDirectorEdit("")
-                        setShowDirector(true)
-                    }, () => {
-                        setShowDirector(true)
-                        setIdDirectorEdit(idDirector)
-                    })
+            if (idDirectorEditName.length >= 3) {
+                if (idDirector.length > 0) {
+                    setIdDirectorEdit("")
+                    setShowDirector(false)
+                    if (idDirector === "0") {
+                        actionInsertRegisterDirector(idDirectorEditName, () => {
+                            setIdDirectorEditName("")
+                            setIdDirectorEdit("")
+                            setShowDirector(true)
+                            setSearchTextDirector(idDirectorEditName)
+                        }, () => {
+                            setShowDirector(true)
+                            setIdDirectorEdit(idDirector)
+                        })
+                    } else {
+                        actionUpdateRegisterDirector(idDirector, idDirectorEditName, () => {
+                            dispatchDirector({ type: 'replaceName', _id: idDirector, name: idDirectorEditName })
+                            setIdDirectorEdit("")
+                            setShowDirector(true)
+                            setSearchTextDirector(idDirectorEditName)
+                        }, () => {
+                            setShowDirector(true)
+                            setIdDirectorEdit(idDirector)
+                        })
+                    }
                 }
             }
         }
@@ -485,27 +489,31 @@ const MovieEditView: React.FC<{
 
         function updateRegisterActor() {
             const idActor = idActorEdit
-            if (idActor.length > 0) {
-                setIdActorEdit("")
-                setShowCast(false)
-                if (idActor === "0") {
-                    actionInsertRegisterActor(idActorEditName, searchTextCast, () => {
-                        setIdActorEditName("")
-                        setIdActorEdit("")
-                        setShowCast(true)
-                    }, () => {
-                        setShowCast(true)
-                        setIdActorEdit(idActor)
-                    })
-                } else {
-                    actionUpdateRegisterActor(idActor, idActorEditName, searchTextCast, () => {
-                        dispatchCast({ type: 'replaceName', _id: idActor, name: idActorEditName })
-                        setIdActorEdit("")
-                        setShowCast(true)
-                    }, () => {
-                        setShowCast(true)
-                        setIdActorEdit(idActor)
-                    })
+            if (idActorEditName.length >= 3) {
+                if (idActor.length > 0) {
+                    setIdActorEdit("")
+                    setShowCast(false)
+                    if (idActor === "0") {
+                        actionInsertRegisterActor(idActorEditName, () => {
+                            setIdActorEditName("")
+                            setIdActorEdit("")
+                            setShowCast(true)
+                            setSearchTextCast(idActorEditName)
+                        }, () => {
+                            setShowCast(true)
+                            setIdActorEdit(idActor)
+                        })
+                    } else {
+                        actionUpdateRegisterActor(idActor, idActorEditName, () => {
+                            dispatchCast({ type: 'replaceName', _id: idActor, name: idActorEditName })
+                            setIdActorEdit("")
+                            setShowCast(true)
+                            setSearchTextCast(idActorEditName)
+                        }, () => {
+                            setShowCast(true)
+                            setIdActorEdit(idActor)
+                        })
+                    }
                 }
             }
         }
@@ -576,7 +584,7 @@ const MovieEditView: React.FC<{
 
         function changeCountry(checked, rowCountry) {
             if (checked) {
-                dispatchCountry({ type: 'add', _id: rowCountry._id, name: rowCountry.name })
+                dispatchCountry({ type: 'add', _id: rowCountry._id, name: rowCountry.initial })
             } else {
                 dispatchCountry({ type: 'remove', _id: rowCountry._id })
             }
@@ -596,27 +604,31 @@ const MovieEditView: React.FC<{
 
         function updateRegisterCountry() {
             const idCountry = idCountryEdit
-            if (idCountry.length > 0) {
-                setIdCountryEdit("")
-                setShowCountry(false)
-                if (idCountry === "0") {
-                    actionInsertRegisterCountry(idCountryEditName, searchTextCountry, () => {
-                        setIdCountryEditName("")
-                        setIdCountryEdit("")
-                        setShowCountry(true)
-                    }, () => {
-                        setShowCountry(true)
-                        setIdCountryEdit(idCountry)
-                    })
-                } else {
-                    actionUpdateRegisterCountry(idCountry, idCountryEditName, searchTextCountry, () => {
-                        dispatchCountry({ type: 'replaceName', _id: idCountry, name: idCountryEditName })
-                        setIdCountryEdit("")
-                        setShowCountry(true)
-                    }, () => {
-                        setShowCountry(true)
-                        setIdCountryEdit(idCountry)
-                    })
+            if (idCountryEditName.length >= 3) {
+                if (idCountry.length > 0) {
+                    setIdCountryEdit("")
+                    setShowCountry(false)
+                    if (idCountry === "0") {
+                        actionInsertRegisterCountry(idCountryEditName, () => {
+                            setIdCountryEditName("")
+                            setIdCountryEdit("")
+                            setShowCountry(true)
+                            setSearchTextCountry(idCountryEditName)
+                        }, () => {
+                            setShowCountry(true)
+                            setIdCountryEdit(idCountry)
+                        })
+                    } else {
+                        actionUpdateRegisterCountry(idCountry, idCountryEditName, () => {
+                            dispatchCountry({ type: 'replaceName', _id: idCountry, name: idCountryEditName })
+                            setIdCountryEdit("")
+                            setShowCountry(true)
+                            setSearchTextCountry(idCountryEditName)
+                        }, () => {
+                            setShowCountry(true)
+                            setIdCountryEdit(idCountry)
+                        })
+                    }
                 }
             }
         }
@@ -640,27 +652,31 @@ const MovieEditView: React.FC<{
 
         function updateRegisterStream() {
             const idStream = idStreamEdit
-            if (idStream.length > 0) {
-                setIdStreamEdit("")
-                setShowStream(false)
-                if (idStream === "0") {
-                    actionInsertRegisterStream(idStreamEditName, searchTextStream, () => {
-                        setIdStreamEditName("")
-                        setIdStreamEdit("")
-                        setShowStream(true)
-                    }, () => {
-                        setShowStream(true)
-                        setIdStreamEdit(idStream)
-                    })
-                } else {
-                    actionUpdateRegisterStream(idStream, idStreamEditName, searchTextStream, () => {
-                        dispatchStream({ type: 'replaceName', _id: idStream, name: idStreamEditName })
-                        setIdStreamEdit("")
-                        setShowStream(true)
-                    }, () => {
-                        setShowStream(true)
-                        setIdStreamEdit(idStream)
-                    })
+            if (idStreamEditName.length >= 3) {
+                if (idStream.length > 0) {
+                    setIdStreamEdit("")
+                    setShowStream(false)
+                    if (idStream === "0") {
+                        actionInsertRegisterStream(idStreamEditName, () => {
+                            setIdStreamEditName("")
+                            setIdStreamEdit("")
+                            setShowStream(true)
+                            setSearchTextStream(idStreamEditName)
+                        }, () => {
+                            setShowStream(true)
+                            setIdStreamEdit(idStream)
+                        })
+                    } else {
+                        actionUpdateRegisterStream(idStream, idStreamEditName, () => {
+                            dispatchStream({ type: 'replaceName', _id: idStream, name: idStreamEditName })
+                            setIdStreamEdit("")
+                            setShowStream(true)
+                            setSearchTextStream(idStreamEditName)
+                        }, () => {
+                            setShowStream(true)
+                            setIdStreamEdit(idStream)
+                        })
+                    }
                 }
             }
         }
@@ -754,39 +770,51 @@ const MovieEditView: React.FC<{
                     <FormControlField valueDefault={searchTextDirector} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchDirector(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextDirector.length > 0 && <IconButton edge="end" onClick={() => changeSearchDirector("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListDirector()}>
+                            {searchTextDirector.length >= 3 && <IconButton edge="end" onClick={() => refreshListDirector()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateDirector.directors.length > 0 || searchTextDirector.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {directors && directors.map((row, key) => (
+                                        {stateDirector.directors.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
                                                 <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdDirectorEdit(row._id)} />}
-                                                        {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdDirectorDelete(row._id)} />}
-                                                        {stateDirector.directors.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeDirectors(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeDirectors(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeDirectors(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(searchTextDirector.length >= 3 && directors) && directors.filter(di => stateDirector.directors.filter(d => d._id === di._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={100} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdDirectorEdit(row._id)} />}
+                                                            {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdDirectorDelete(row._id)} />}
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeDirectors(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonSuccess title="REGISTRAR NOVO DIRETOR" actionClick={() => {
                         setIdDirectorEditName("")
@@ -823,39 +851,51 @@ const MovieEditView: React.FC<{
                     <FormControlField valueDefault={searchTextCast} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchCast(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextCast.length > 0 && <IconButton edge="end" onClick={() => changeSearchCast("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListCast()}>
+                            {searchTextCast.length >= 3 && <IconButton edge="end" onClick={() => refreshListCast()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateCast.casts.length > 0 || searchTextCast.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {actors && actors.map((row, key) => (
+                                        {stateCast.casts.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
                                                 <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdActorEdit(row._id)} />}
-                                                        {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdActorDelete(row._id)} />}
-                                                        {stateCast.casts.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCasts(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCasts(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCasts(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(searchTextCast.length >= 3 && actors) && actors.filter(ac => stateCast.casts.filter(c => c._id === ac._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={100} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdActorEdit(row._id)} />}
+                                                            {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdActorDelete(row._id)} />}
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCasts(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonSuccess title="REGISTRAR NOVO ATOR" actionClick={() => {
                         setIdActorEditName("")
@@ -872,37 +912,49 @@ const MovieEditView: React.FC<{
                     <FormControlField valueDefault={searchTextCategory} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchCategory(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextCategory.length > 0 && <IconButton edge="end" onClick={() => changeSearchCategory("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListCategory()}>
+                            {searchTextCategory.length >= 3 && <IconButton edge="end" onClick={() => refreshListCategory()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateCategory.categories.length > 0 || searchTextCategory.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {categories && categories.map((row, key) => (
+                                        {stateCategory.categories.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
-                                                <TableCellStyle width={50} align="center">
+                                                <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {stateCategory.categories.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCategories(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCategories(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCategories(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(searchTextCategory.length >= 3 && categories) && categories.filter(ca => stateCategory.categories.filter(c => c._id === ca._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={50} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCategories(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonDanger title="FECHAR" actionClick={() => setShowCategory(false)} />
                 </DialogActions>
@@ -935,39 +987,51 @@ const MovieEditView: React.FC<{
                     <FormControlField valueDefault={searchTextCountry} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchCountry(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextCountry.length > 0 && <IconButton edge="end" onClick={() => changeSearchCountry("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListCountry()}>
+                            {searchTextCountry.length >= 3 && <IconButton edge="end" onClick={() => refreshListCountry()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateCountry.countries.length > 0 || searchTextCountry.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {countries && countries.map((row, key) => (
+                                        {stateCountry.countries.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
                                                 <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdCountryEdit(row._id)} />}
-                                                        {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdCountryDelete(row._id)} />}
-                                                        {stateCountry.countries.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCountry(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCountry(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCountry(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(countries && searchTextCountry.length >= 3) && countries.filter(co => stateCountry.countries.filter(c => c._id === co._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.initial}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={100} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdCountryEdit(row._id)} />}
+                                                            {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdCountryDelete(row._id)} />}
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCountry(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonSuccess title="REGISTRAR NOVO PAÍS" actionClick={() => {
                         setIdCountryEditName("")
@@ -1004,39 +1068,51 @@ const MovieEditView: React.FC<{
                     <FormControlField valueDefault={searchTextStream} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchStream(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextStream.length > 0 && <IconButton edge="end" onClick={() => changeSearchStream("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListStream()}>
+                            {searchTextStream.length >= 3 && <IconButton edge="end" onClick={() => refreshListStream()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateStream.streams.length > 0 || searchTextStream.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {streams && streams.map((row, key) => (
+                                        {stateStream.streams.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
                                                 <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdStreamEdit(row._id)} />}
-                                                        {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdStreamDelete(row._id)} />}
-                                                        {stateStream.streams.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeStream(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeStream(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeStream(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(searchTextStream.length >= 3 && streams) && streams.filter(st => stateStream.streams.filter(s => s._id === st._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={100} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdStreamEdit(row._id)} />}
+                                                            {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdStreamDelete(row._id)} />}
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeStream(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonSuccess title="REGISTRAR NOVO STREAM" actionClick={() => {
                         setIdStreamEditName("")
@@ -1055,75 +1131,75 @@ const MovieEditView: React.FC<{
                             <CardActions>
                                 <Grid container spacing={2}>
                                     <Grid item md={4} xs={12}>
-                                        <FormControlField labelValue="TÍTULO*" valueDefault={titleField} onChangeForm={(e) => setTitleField(e.target.value)} />
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="TÍTULO*" valueDefault={titleField} onChangeForm={(e) => setTitleField(e.target.value)} />
                                     </Grid>
                                     <Grid item md={3} xs={12}>
-                                        <FormControlField labelValue="LANÇAMENTO*" valueDefault={releaseStrField} InputProps={{
-                                            endAdornment: <InputAdornment position="end">
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="LANÇAMENTO*" valueDefault={releaseStrField} InputProps={{
+                                            endAdornment: (getMovie && !isLoading) ? <InputAdornment position="end">
                                                 <IconButton onClick={() => setShowRelease(true)} edge="end">
                                                     <IconList icon={ICON_OBJECT_LIST.CALENDAR_MONTH_ICON} />
                                                 </IconButton>
-                                            </InputAdornment>
+                                            </InputAdornment> : null
                                         }} />
                                     </Grid>
                                     <Grid item md={5} xs={12}>
-                                        <FormControlField labelValue="DIRETOR" valueDefault={getShowDirectors()} InputProps={{
-                                            endAdornment: <InputAdornment position="end">
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="DIRETOR" valueDefault={getShowDirectors()} InputProps={{
+                                            endAdornment: (getMovie && !isLoading) ? <InputAdornment position="end">
                                                 <IconButton onClick={() => setShowDirector(true)} edge="end">
                                                     <IconList icon={ICON_OBJECT_LIST.ARROW_FORWARD_IOS_ICON} />
                                                 </IconButton>
-                                            </InputAdornment>
+                                            </InputAdornment> : null
                                         }} />
                                     </Grid>
                                     <Grid item xs={5}>
-                                        <FormControlField labelValue="ELENCO" valueDefault={getShowCasts()} InputProps={{
-                                            endAdornment: <InputAdornment position="end">
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="ELENCO" valueDefault={getShowCasts()} InputProps={{
+                                            endAdornment: (getMovie && !isLoading) ? <InputAdornment position="end">
                                                 <IconButton onClick={() => setShowCast(true)} edge="end">
                                                     <IconList icon={ICON_OBJECT_LIST.ARROW_FORWARD_IOS_ICON} />
                                                 </IconButton>
-                                            </InputAdornment>
+                                            </InputAdornment> : null
                                         }} />
                                     </Grid>
                                     <Grid item xs={2}>
-                                        <FormControlFieldMask valueMask='99:99' labelValue="DURAÇÃO*" valueDefault={durationField} onChangeForm={(e) => setDurationField(e.target.value)} />
+                                        <FormControlFieldMask isDisabled={(!getMovie || isLoading)} valueMask='99:99' labelValue="DURAÇÃO*" valueDefault={durationField} onChangeForm={(e) => setDurationField(e.target.value)} />
                                     </Grid>
                                     <Grid item xs={5}>
-                                        <FormControlField labelValue="CATEGORIA" valueDefault={getShowCategories()} InputProps={{
-                                            endAdornment: <InputAdornment position="end">
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="CATEGORIA" valueDefault={getShowCategories()} InputProps={{
+                                            endAdornment: (getMovie && !isLoading) ? <InputAdornment position="end">
                                                 <IconButton onClick={() => setShowCategory(true)} edge="end">
                                                     <IconList icon={ICON_OBJECT_LIST.ARROW_FORWARD_IOS_ICON} />
                                                 </IconButton>
-                                            </InputAdornment>
+                                            </InputAdornment> : null
                                         }} />
                                     </Grid>
                                     <Grid item md={3} xs={12}>
-                                        <FormControlField labelValue="PAÍS DE ORIGEM" valueDefault={getShowCountries()} InputProps={{
-                                            endAdornment: <InputAdornment position="end">
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="PAÍS DE ORIGEM" valueDefault={getShowCountries()} InputProps={{
+                                            endAdornment: (getMovie && !isLoading) ? <InputAdornment position="end">
                                                 <IconButton onClick={() => setShowCountry(true)} edge="end">
                                                     <IconList icon={ICON_OBJECT_LIST.ARROW_FORWARD_IOS_ICON} />
                                                 </IconButton>
-                                            </InputAdornment>
+                                            </InputAdornment> : null
                                         }} />
                                     </Grid>
                                     <Grid item md={3} xs={12}>
-                                        <FormControlField labelValue="STREAM" valueDefault={getShowStreams()} InputProps={{
-                                            endAdornment: <InputAdornment position="end">
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="STREAM" valueDefault={getShowStreams()} InputProps={{
+                                            endAdornment: (getMovie && !isLoading) ? <InputAdornment position="end">
                                                 <IconButton onClick={() => setShowStream(true)} edge="end">
                                                     <IconList icon={ICON_OBJECT_LIST.ARROW_FORWARD_IOS_ICON} />
                                                 </IconButton>
-                                            </InputAdornment>
+                                            </InputAdornment> : null
                                         }} />
                                     </Grid>
                                     <Grid item md={1} xs={12}>
-                                        <FormControlFieldSelect labelValue="CINEMA*" valueDefault={movieTheaterField} selectList={[{ label: 'SIM', value: 'YES' }, { label: 'NÃO', value: 'NOT' }]} onChangeForm={(e) => setMovieTheaterField(e.target.value)} />
+                                        <FormControlFieldSelect isDisabled={(!getMovie || isLoading)} labelValue="CINEMA*" valueDefault={movieTheaterField} selectList={[{ label: 'SIM', value: 'YES' }, { label: 'NÃO', value: 'NOT' }]} onChangeForm={(e) => setMovieTheaterField(e.target.value)} />
                                     </Grid>
                                     <Grid item md={5} xs={12}>
-                                        <FormControlField labelValue="SINOPSE" valueDefault={resumeField} onChangeForm={(e) => setResumeField(e.target.value)} />
+                                        <FormControlField isDisabled={(!getMovie || isLoading)} labelValue="SINOPSE" valueDefault={resumeField} onChangeForm={(e) => setResumeField(e.target.value)} />
                                     </Grid>
                                 </Grid>
                             </CardActions>
                             <CardActions className={classes.button_end}>
-                                <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => update(titleField, releaseField, stateDirector.directors.map(d => d._id), stateCast.casts.map(c => c._id), durationField, stateCategory.categories.map(c => c._id), stateCountry.countries.map(c => c._id), stateStream.streams.map(c => c._id), movieTheaterField, resumeField)} />
+                                <ButtonSuccess title="SALVAR" isDisabled={(!getMovie || isLoading)} iconStart={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => update(titleField, releaseField, stateDirector.directors.map(d => d._id), stateCast.casts.map(c => c._id), durationField, stateCategory.categories.map(c => c._id), stateCountry.countries.map(c => c._id), stateStream.streams.map(c => c._id), movieTheaterField, resumeField)} />
                                 <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_MOVIES)} />
                             </CardActions>
                         </Card>

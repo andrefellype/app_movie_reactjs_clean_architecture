@@ -3,8 +3,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import { MSG_NEW_REGISTER_SUCCESS, MSG_SAVED_DATA } from '../../../app/core/consts'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { showLoadingPattern, insertMsgs } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { openTvShowById } from '../../../app/redux/TvShow/tvshow.actions'
 import { getTvShowSingle } from '../../../app/redux/TvShow/tvshow.selector'
 import { registerTvShowEpisode } from '../../../app/redux/TvShowEpisode/tvshowepisode.actions'
@@ -23,30 +22,30 @@ function TvShowEpisodeNew() {
 
     async function insertSeason(nameField: string) {
         if (typeof tvShowSeasonId !== "undefined" && tvShowSeasonId !== null) {
-            await dispatch(showLoading(true, MSG_SAVED_DATA))
+            await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
             await dispatch(registerTvShowEpisode(tvShowSeasonId, nameField, () => {
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
                 dispatch(insertMsgs([MSG_NEW_REGISTER_SUCCESS], "success", null, "reload_page"))
             }, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
     }
 
     React.useEffect(() => {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            dispatch(showLoading(true))
-            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
+            dispatch(showLoadingPattern(true))
+            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
         if (typeof tvShowSeasonId !== "undefined" && tvShowSeasonId !== null) {
-            dispatch(showLoading(true))
-            dispatch(openTvShowSeasonById(tvShowSeasonId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
+            dispatch(showLoadingPattern(true))
+            dispatch(openTvShowSeasonById(tvShowSeasonId.toString(), () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
         // eslint-disable-next-line

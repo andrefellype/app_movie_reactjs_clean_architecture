@@ -1,6 +1,3 @@
-/* eslint-disable react/jsx-fragments */
-/* eslint-disable react/jsx-no-useless-fragment */
-/* eslint-disable prefer-destructuring */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { MSG_NEW_REGISTER_SUCCESS, MSG_SAVED_DATA } from '../../../app/core/consts'
@@ -8,8 +5,7 @@ import { getCategoryAll } from '../../../app/redux/Category/category.actions'
 import { getCategoriesAll, getCategoriesAllFilter } from '../../../app/redux/Category/category.selector'
 import { getCountryAll } from '../../../app/redux/Country/country.actions'
 import { getCountriesAll, getCountriesAllFilter, getCountrySingle } from '../../../app/redux/Country/country.selector'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { showLoadingPattern, insertMsgs } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { getStreamAll } from '../../../app/redux/Stream/stream.actions'
 import { getStreamsAll, getStreamsAllFilter, getStreamSingle } from '../../../app/redux/Stream/stream.selector'
 import { registerTvShow } from '../../../app/redux/TvShow/tvshow.actions'
@@ -32,57 +28,57 @@ function TvShowNew() {
     const stream = useSelector(getStreamSingle)
 
     React.useEffect(() => {
-        dispatch(showLoading(true))
+        dispatch(showLoadingPattern(true))
         dispatch(getCategoryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, ""))
         dispatch(getCountryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, ""))
-        dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, ""))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListCategory(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, searchText))
         callbackSucess()
     }
 
     async function refreshListCountry(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getCountryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListStream(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function insertMovie(titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string) {
-        await dispatch(showLoading(true, MSG_SAVED_DATA))
+        await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
         await dispatch(registerTvShow(titleValue, releaseValue, categoriesValue, countriesValue, streamsValue, resumeValue, () => {
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
             dispatch(insertMsgs([MSG_NEW_REGISTER_SUCCESS], "success", null, "reload_page"))
         }, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }))
     }
 
@@ -92,16 +88,16 @@ function TvShowNew() {
             openStream={(idStream: string) => dispatch(TvShowNewStreamOpenById(idStream))}
             actionChangeSearchStream={(searchText: string) => dispatch(TvShowNewStreamBySearch(searchText, streamsGeneral))}
             actionRefreshListStream={(searchText: string, callbackSucess: () => void) => refreshListStream(searchText, callbackSucess)}
-            actionInsertRegisterStream={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewStreamInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterStream={(idStream: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewStreamUpdate(idStream, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterStream={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewStreamInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterStream={(idStream: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewStreamUpdate(idStream, nameValue, callbackSuccess, calllbackError))}
             actionDeleteRegisterStream={(streamId: string, searchText: string, successDestroy: () => void) => dispatch(TvShowNewStreamDelete(streamId, searchText, successDestroy))}
 
             countries={countries} country={country}
             openCountry={(idCountry: string) => dispatch(TvShowNewCountryOpenById(idCountry))}
             actionChangeSearchCountry={(searchText: string) => dispatch(TvShowNewCountryBySearch(searchText, countriesGeneral))}
             actionRefreshListCountry={(searchText: string, callbackSucess: () => void) => refreshListCountry(searchText, callbackSucess)}
-            actionInsertRegisterCountry={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewCountryInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterCountry={(idCountry: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewCountryUpdate(idCountry, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterCountry={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewCountryInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterCountry={(idCountry: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowNewCountryUpdate(idCountry, nameValue, callbackSuccess, calllbackError))}
             actionDeleteRegisterCountry={(countryId: string, searchText: string, successDestroy: () => void) => dispatch(TvShowNewCountryDelete(countryId, searchText, successDestroy))}
 
             categories={categories} actionChangeSearchCategory={(searchText: string) => dispatch(TvShowNewCategoryBySearch(searchText, categoriesGeneral))}

@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-fragments */
-/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable no-console */
 import React from "react"
 import { useNavigate } from "react-router-dom"
@@ -9,9 +8,9 @@ import IconList from "../IconList"
 
 type HeaderItemModel = {
     icon?: string | null, title?: string | null, badgeText?: string | null, isNotification?: boolean,
-    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: () => void | null }[],
-    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: () => void | null }[],
-    redirectUrl?: string | null, clickOut?: () => void | null, sx?: object
+    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
+    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
+    redirectUrl?: string | null, clickOut?: (() => void) | null, sx?: object
 }
 const HeaderItem: React.FC<HeaderItemModel> = function ({ icon, title, badgeText, isNotification, notifications, dropdowns, redirectUrl, clickOut, sx }): JSX.Element | null {
 
@@ -21,14 +20,14 @@ const HeaderItem: React.FC<HeaderItemModel> = function ({ icon, title, badgeText
     const [showDropdown, setShowDropdown] = React.useState(false)
 
     function getNotifications() {
-        if (notifications != null) {
+        if (typeof notifications !== "undefined" && notifications != null) {
             return notifications
         }
         return []
     }
 
     function getDropdowns() {
-        if (dropdowns != null) {
+        if (typeof dropdowns !== "undefined" && dropdowns != null) {
             return dropdowns
         }
         return []

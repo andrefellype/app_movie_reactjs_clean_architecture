@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const TvShowEpisodeEditView: React.FC<{ getTvShow: any, getTvShowSeason: any, getEpisode: any, update: any }> = function ({ getTvShow, getTvShowSeason, getEpisode, update }) {
+const TvShowEpisodeEditView: React.FC<{ getTvShow: any, getTvShowSeason: any, getEpisode: any, isLoading: boolean, update: any }> = function ({ getTvShow, getTvShowSeason, getEpisode, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -44,12 +44,12 @@ const TvShowEpisodeEditView: React.FC<{ getTvShow: any, getTvShowSeason: any, ge
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <FormControlField isDisabled={!getEpisode} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getEpisode || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getEpisode} actionClick={() => update(nameField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getEpisode || isLoading)} actionClick={() => update(nameField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(`${URL_TV_SHOW_EPISODES}/${getTvShowSeason._id}/${getTvShow ? getTvShow._id : ""}`)} />
                         </CardActions>
                     </Card>

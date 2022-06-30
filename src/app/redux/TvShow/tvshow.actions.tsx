@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import CryptographyConvert from "../../components/CryptographyConvert"
 import api from "../../core/api"
 import { TOKEN_LOCAL_STORAGE, TV_SHOW_LIST_FILTER_REDUCER, TV_SHOW_LIST_REDUCER, TV_SHOW_SINGLE_REDUCER } from "../../core/consts"
@@ -106,15 +107,6 @@ function orderTvShows(tvShows, type: string) {
             if (tvShowA.title.toLowerCase() < tvShowB.title.toLowerCase()) {
                 return -1
             }
-        } else if (type === "category") {
-            const categoryA = tvShowA.categories.length > 0 ? tvShowA.categories.reduce((actual, categoryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObA.name}`, "") : "SEM CATEGORIA"
-            const categoryB = tvShowB.categories.length > 0 ? tvShowB.categories.reduce((actual, categoryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObB.name}`, "") : "SEM CATEGORIA"
-            if (categoryA.toLowerCase() > categoryB.toLowerCase()) {
-                return 1
-            }
-            if (categoryA.toLowerCase() < categoryB.toLowerCase()) {
-                return -1
-            }
         } else if (type === "releaseUp" || type === "releaseDown") {
             const statusOrder = type === "releaseUp"
             let yearA = tvShowA.release.length === 4 ? parseInt(tvShowA.release, 10) : 0
@@ -150,15 +142,6 @@ function orderTvShows(tvShows, type: string) {
                     if (dayA > dayB) return statusOrder ? 1 : -1
                     if (dayA < dayB) return statusOrder ? -1 : 1
                 }
-            }
-        } else if (type === "country") {
-            const countryA = tvShowA.countries.length > 0 ? tvShowA.countries.reduce((actual, countryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObA.name}`, "") : "SEM PAÍS DE ORIGEM"
-            const countryB = tvShowB.countries.length > 0 ? tvShowB.countries.reduce((actual, countryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObB.name}`, "") : "SEM PAÍS DE ORIGEM"
-            if (countryA.toLowerCase() > countryB.toLowerCase()) {
-                return 1
-            }
-            if (countryA.toLowerCase() < countryB.toLowerCase()) {
-                return -1
             }
         }
         return 0
@@ -205,6 +188,39 @@ export const getTvShowAllByNotMyTvShow = (callbackSuccess: () => void, callbackE
             let tvShowsFilterValue = searchTvShows(tvShowsValue, searchTextValue)
             tvShowsFilterValue = orderTvShows(tvShowsFilterValue, "title")
             dispatch({ type: TV_SHOW_LIST_REDUCER, tvShows: tvShowsValue, tvShowsFilter: tvShowsFilterValue })
+            callbackSuccess()
+        } else {
+            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+        }
+    }).catch(() => {
+        window.location.href = "/failpage/error_api"
+    })
+}
+
+export const getDetailsTvShowAll = (tvShowsGeneral, tvShowsPagination, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const idsTvShow: any[] = []
+    for (let tg = 0; tg < tvShowsGeneral.length; tg++) {
+        let statusDetails = false
+        for (let t = 0; t < tvShowsPagination.length; t++) {
+            if (tvShowsPagination[t]._id === tvShowsGeneral[tg]._id) {
+                statusDetails = true
+            }
+        }
+        if (statusDetails) {
+            idsTvShow.push(tvShowsGeneral[tg]._id)
+        }
+    }
+    await api.post("tvshow/open/details/all", { tvShowIds: idsTvShow, object: { category: true, country: true } }).then(response => {
+        if (response.data.status) {
+            const tvShowsData = response.data.datas
+            const tvShowsNew = tvShowsGeneral.map(m => {
+                const tvShowsDataFilter = tvShowsData.filter(md => md._id === m._id)
+                if (tvShowsDataFilter.length > 0)
+                    return tvShowsDataFilter[0]
+                return m
+            })
+            dispatch({ type: TV_SHOW_LIST_FILTER_REDUCER, tvShows: tvShowsNew })
             callbackSuccess()
         } else {
             callbackError(response.data.errors.map(erro => `${erro.msg}`))

@@ -2,8 +2,9 @@ import { createStore, combineReducers, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
-import loadingMainReducerClass from "./LoadingMain/loadingMain.reducer"
-import msgAlertReducerClass from "./MsgAlert/msgAlert.reducer"
+import utilsAppLoadingClass from "./UtlisAppRedux/utlisAppReduxLoading.reducer"
+import utilsAppMsgClass from "./UtlisAppRedux/utlisAppReduxMsg.reducer"
+import utilsAppScrollToTopClass from "./UtlisAppRedux/utilsAppReduxScrollToTop.reducer"
 import userReducerClass from "./User/user.reducer"
 import aboutUsReducerClass from "./AboutUs/aboutUs.reducer"
 import categoryReducerClass from "./Category/category.reducer"
@@ -21,8 +22,9 @@ import myTvShowReducerClass from "./MyTvShow/myTvShow.reducer"
 const middleware = [thunk]
 
 const rootReducer = combineReducers({
-    loadingMain: loadingMainReducerClass,
-    msgAlert: msgAlertReducerClass,
+    utilsAppLoading: utilsAppLoadingClass,
+    utilsAppMsg: utilsAppMsgClass,
+    utilsAppScrollToTop: utilsAppScrollToTopClass,
     userReducer: userReducerClass,
     aboutUsReducer: aboutUsReducerClass,
     categoryReducer: categoryReducerClass,

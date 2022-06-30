@@ -3,12 +3,12 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 import { getUserSingle } from '../../../app/redux/User/user.selector'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { insertMsgs, showLoadingPattern } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { URL_USERS, USER_LOCAL_STORAGE } from '../../../app/core/consts'
 import { openUserById } from '../../../app/redux/User/user.actions'
 import CryptographyConvert from '../../../app/components/CryptographyConvert'
 import UserShowView from './view'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function UserShow() {
 
@@ -16,6 +16,8 @@ function UserShow() {
     const navigate = useNavigate()
 
     const getUser = useSelector(getUserSingle)
+    const getLoading = useSelector(showStatusLoading)
+
     const { userId } = useParams()
 
     async function verifyIdUser() {
@@ -35,9 +37,9 @@ function UserShow() {
     React.useEffect(() => {
         verifyIdUser().then(statusVerify => {
             if (statusVerify) {
-                dispatch(showLoading(true))
-                dispatch(openUserById(userId as string, () => dispatch(showLoading(false)), (errorsMsg) => {
-                    dispatch(showLoading(false))
+                dispatch(showLoadingPattern(true))
+                dispatch(openUserById(userId as string, () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
+                    dispatch(showLoadingPattern(false))
                     dispatch(insertMsgs(errorsMsg, 'error'))
                 }))
             } else {
@@ -47,8 +49,15 @@ function UserShow() {
         // eslint-disable-next-line
     }, [])
 
+    function getIsLoading() {
+        if (typeof getLoading !== "undefined" && typeof getLoading.statusPattern !== "undefined") {
+            return getLoading.statusPattern
+        }
+        return false
+    }
+
     return (
-        <UserShowView getUser={getUser} />
+        <UserShowView getUser={getUser} isLoading={getIsLoading()} />
     )
 }
 

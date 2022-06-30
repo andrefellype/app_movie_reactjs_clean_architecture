@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const DirectorEditView: React.FC<{ getDirector: any, update: any }> = function ({ getDirector, update }) {
+const DirectorEditView: React.FC<{ getDirector: any, isLoading: boolean, update: any }> = function ({ getDirector, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -40,12 +40,12 @@ const DirectorEditView: React.FC<{ getDirector: any, update: any }> = function (
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <FormControlField isDisabled={!getDirector} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getDirector || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getDirector} actionClick={() => update(nameField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getDirector || isLoading)} actionClick={() => update(nameField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_DIRECTORS)} />
                         </CardActions>
                     </Card>

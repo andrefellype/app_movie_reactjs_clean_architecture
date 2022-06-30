@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
-import { Card, CardActions, Grid, TableContainer, Paper, Table, TableHead, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox } from "@mui/material"
+import { Card, CardActions, Grid, TableContainer, Paper, Table, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 import FormControlField from "../../../app/components/FormControl/FormControlField"
@@ -14,8 +14,10 @@ import TableCellStyle from '../../../app/components/Table/TableCellStyle'
 import TableRowStyle from '../../../app/components/Table/TableRowStyle'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
-import { MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, MSG_EMPTY_LIST, URL_DIRECTOR_EDIT, URL_DIRECTOR_NEW } from '../../../app/core/consts'
-import PaginationList from '../../../app/components/PaginationList'
+import { MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, URL_DIRECTOR_EDIT, URL_DIRECTOR_NEW } from '../../../app/core/consts'
+import ScrollInfiniteList from '../../../app/components/ScrollInfiniteList'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -41,12 +43,18 @@ function reducerArrayDeleteBatch(state, action) {
     }
 }
 
-const DirectorListView: React.FC<{ directors: any, directorsBatch: any, positionPage: number, countDirector: number, changePagination: any, actionChangeSearchText: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any }> =
-    function ({ directors, directorsBatch, positionPage, countDirector, changePagination, actionChangeSearchText, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister }) {
+const DirectorListView: React.FC<{ directors: any, showLoading: boolean, actionChangeSearchText: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any, getListScroll: (valueScroll: number) => any[] }> =
+    function ({ directors, showLoading, actionChangeSearchText, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister, getListScroll }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
 
+        const valueInitialScroll = 20
+        const valueInitialScrollBatch = 15
+
+        const [positionScroll, setPositionScroll] = React.useState(0)
+        const [positionScrollBatch, setPositionScrollBatch] = React.useState(0)
+        const [listScroll, setListScroll] = React.useState<any[]>([])
         const [idDelete, setIdDelete] = React.useState(-1)
         const [isDeleteBatch, setIsDeleteBatch] = React.useState(false)
         const [idReviewed, setIdReviewed] = React.useState("")
@@ -54,12 +62,24 @@ const DirectorListView: React.FC<{ directors: any, directorsBatch: any, position
         const [stateArrayDeleteBatch, dispatchArrayDeleteBatch] = React.useReducer(reducerArrayDeleteBatch, { arrayDeleteBatch: [] })
         const [searchText, setSearchText] = React.useState("")
 
+        React.useEffect(() => {
+            if (directors) {
+                setListScroll(getListScroll((positionScroll * valueInitialScroll)))
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [positionScroll, directors])
+
         function changeSearchText(search: string) {
+            setPositionScroll(0)
+            getListScroll(0)
             setSearchText(search)
-            actionChangeSearchText(search)
+            actionChangeSearchText(search, () => {
+                setPositionScroll(1)
+            })
         }
 
         async function refreshList() {
+            setPositionScroll(0)
             actionRefreshList(searchText)
         }
 
@@ -100,28 +120,24 @@ const DirectorListView: React.FC<{ directors: any, directorsBatch: any, position
                     </InputAdornment>
                 }} />
                 <ButtonSuccess style={{ marginLeft: 10 }} titleIcon={ICON_OBJECT_LIST.ADD_ICON} iconTitleSize="medium" actionClick={() => navigate(URL_DIRECTOR_NEW)} />
-                <ButtonDanger isDisabled={(!directorsBatch || directorsBatch.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
+                <ButtonDanger isDisabled={(!directors || directors.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
             </CardActions>)
         }
 
         function getListDirectors() {
-            return <CardActions className={classes.flex_center}>
-                <TableContainer component={Paper}>
-                    <Table aria-label="customized table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCellStyle>Nome</TableCellStyle>
-                                <TableCellStyle width={100} />
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(!directors || directors.length === 0) ?
-                                <TableRowStyle hover>
-                                    <TableCellStyle colSpan={2} scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                        {MSG_EMPTY_LIST.toUpperCase()}
-                                    </TableCellStyle>
-                                </TableRowStyle> :
-                                directors.map((row, key) => (
+            return <ScrollInfiniteList isShowScroll={(!directors || (positionScroll * valueInitialScroll) < directors.length)}
+                updateScroll={() => setPositionScroll((positionScroll + 1))}>
+                <CardActions className={classes.flex_center}>
+                    <TableContainer component={Paper}>
+                        <Table aria-label="customized table">
+                            <TableHeadStyle>
+                                <TableRow>
+                                    <TableCellStyle>Nome</TableCellStyle>
+                                    <TableCellStyle width={100} />
+                                </TableRow>
+                            </TableHeadStyle>
+                            <TableBodyStyle isLoading={showLoading} colSpanValue={2} listData={directors}>
+                                {listScroll.map((row, key) => (
                                     <TableRowStyle hover key={key}>
                                         <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                             {row.name}
@@ -135,10 +151,11 @@ const DirectorListView: React.FC<{ directors: any, directorsBatch: any, position
                                         </TableCellStyle>
                                     </TableRowStyle>
                                 ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </CardActions>
+                            </TableBodyStyle>
+                        </Table>
+                    </TableContainer>
+                </CardActions>
+            </ScrollInfiniteList>
         }
 
         function dialogDeleteBatch() {
@@ -146,24 +163,27 @@ const DirectorListView: React.FC<{ directors: any, directorsBatch: any, position
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TableContainer component={Paper}>
-                                <Table aria-label="customized table">
-                                    <TableBody>
-                                        {directorsBatch && directorsBatch.map((row, key) => (
-                                            <TableRowStyle hover key={key}
-                                                onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
-                                                <TableCellStyle width={25} align="center">
-                                                    <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
-                                                        onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
-                                                </TableCellStyle>
-                                                <TableCellStyle scope="row" align="left">
-                                                    {row.name}
-                                                </TableCellStyle>
-                                            </TableRowStyle>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            <ScrollInfiniteList isShowScroll={(!directors || (positionScrollBatch * valueInitialScrollBatch) < directors.length)}
+                                updateScroll={() => setPositionScrollBatch((positionScrollBatch + 1))}>
+                                <TableContainer component={Paper}>
+                                    <Table aria-label="customized table">
+                                        <TableBody>
+                                            {directors && getListScroll((positionScrollBatch * valueInitialScrollBatch)).map((row, key) => (
+                                                <TableRowStyle hover key={key}
+                                                    onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
+                                                    <TableCellStyle width={25} align="center">
+                                                        <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
+                                                            onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
+                                                    </TableCellStyle>
+                                                    <TableCellStyle scope="row" align="left">
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </ScrollInfiniteList>
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -181,8 +201,6 @@ const DirectorListView: React.FC<{ directors: any, directorsBatch: any, position
                         <Card>
                             {filterListDirectors()}
                             {getListDirectors()}
-                            <PaginationList valuePage={positionPage} dataList={directors} countList={countDirector} style={{ margin: 5 }}
-                                actionClick={(value: number) => changePagination(value)} />
                         </Card>
                     </Grid>
                 </Grid>

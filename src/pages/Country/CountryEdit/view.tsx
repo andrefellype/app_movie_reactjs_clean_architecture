@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const CountryEditView: React.FC<{ getCountry: any, update: any }> = function ({ getCountry, update }) {
+const CountryEditView: React.FC<{ getCountry: any, isLoading: boolean, update: any }> = function ({ getCountry, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -28,7 +28,7 @@ const CountryEditView: React.FC<{ getCountry: any, update: any }> = function ({ 
 
     React.useEffect(() => {
         if (getCountry) {
-            setNameField(getCountry.name)
+            setNameField(getCountry.initial)
         }
     }, [getCountry])
 
@@ -40,12 +40,12 @@ const CountryEditView: React.FC<{ getCountry: any, update: any }> = function ({ 
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <FormControlField isDisabled={!getCountry} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getCountry || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getCountry} actionClick={() => update(nameField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getCountry || isLoading)} actionClick={() => update(nameField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_COUNTRIES)} />
                         </CardActions>
                     </Card>

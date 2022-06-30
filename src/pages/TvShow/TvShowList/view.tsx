@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
-import { Card, CardActions, Grid, TableContainer, Paper, Table, TableHead, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material"
+import { Card, CardActions, Grid, TableContainer, Paper, Table, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 import FormControlField from "../../../app/components/FormControl/FormControlField"
@@ -15,11 +15,14 @@ import TableCellStyle from '../../../app/components/Table/TableCellStyle'
 import TableRowStyle from '../../../app/components/Table/TableRowStyle'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
-import { MONTHS, MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, MSG_EMPTY_LIST, URL_TV_SHOW_EDIT, URL_TV_SHOW_NEW, URL_TV_SHOW_SEASONS } from '../../../app/core/consts'
+import { MONTHS, MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, URL_TV_SHOW_EDIT, URL_TV_SHOW_NEW, URL_TV_SHOW_SEASONS } from '../../../app/core/consts'
 import FormControlFieldSelect from '../../../app/components/FormControl/FormControlFieldSelect'
 import ConvertDate from '../../../app/components/Utils/ConvertDate'
 import ButtonPink from '../../../app/components/Button/ButtonPink'
 import PaginationList from '../../../app/components/PaginationList'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
+import ScrollInfiniteList from '../../../app/components/ScrollInfiniteList'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -45,12 +48,15 @@ function reducerArrayDeleteBatch(state, action) {
     }
 }
 
-const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatch: any, positionPage: number, countTvShow: any, changePagination: any, getCategories: any, getCountries: any, actionOrderList: any, actionChangeSearchText: any, actionClickFilter: any, actionEraseFilter: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any }> =
-    function ({ orderDefault, tvShows, tvShowsBatch, positionPage, countTvShow, changePagination, getCategories, getCountries, actionOrderList, actionChangeSearchText, actionClickFilter, actionEraseFilter, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister }) {
+const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatch: any, positionPage: number, countTvShow: any, changePagination: any, getCategories: any, getCountries: any, actionOrderList: any, actionChangeSearchText: any, actionClickFilter: any, actionEraseFilter: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any, showLoading: boolean, getListScroll: (valueScroll: number) => any[] }> =
+    function ({ orderDefault, tvShows, tvShowsBatch, positionPage, countTvShow, changePagination, getCategories, getCountries, actionOrderList, actionChangeSearchText, actionClickFilter, actionEraseFilter, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister, showLoading, getListScroll }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
 
+        const valueInitialScrollBatch = 15
+
+        const [positionScrollBatch, setPositionScrollBatch] = React.useState(0)
         const [idReviewed, setIdReviewed] = React.useState("")
         const [idDelete, setIdDelete] = React.useState(-1)
         const [isDeleteBatch, setIsDeleteBatch] = React.useState(false)
@@ -150,16 +156,26 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
             if (getCountries !== null && typeof getCountries !== "undefined") {
                 const countriesValue = [{ label: "SEM PAÍS", value: "-1" }]
                 getCountries.forEach(country => {
-                    countriesValue.push({ label: country.name, value: country._id })
+                    countriesValue.push({ label: country.initial, value: country._id })
                 })
                 setCountries(countriesValue)
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [getCountries])
 
+        const [typingTimeout, setTypingTimeout] = React.useState<any>(0)
+
+        function searchFinish(search: string) {
+            actionChangeSearchText(orderField, search, categoryFilter, releaseFilter, countryFilter)
+        }
+
         function changeSearchText(search: string) {
             setSearchText(search)
-            actionChangeSearchText(orderField, search, categoryFilter, releaseFilter, countryFilter)
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            // eslint-disable-next-line prefer-arrow-callback
+            setTypingTimeout(setTimeout(() => searchFinish(search), 500))
         }
 
         async function refreshList() {
@@ -306,7 +322,7 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
 
         function getShowCountries(rowTvShow) {
             if (rowTvShow.countries.length > 0) {
-                return rowTvShow.countries.reduce((actual, countryOb) => `${actual.length > 0 ? `${actual}, ` : ""}${countryOb.name}`, "")
+                return rowTvShow.countries.reduce((actual, countryOb) => `${actual.length > 0 ? `${actual}, ` : ""}${countryOb.initial}`, "")
             }
             return "SEM PAÍS DE ORIGEM"
         }
@@ -325,7 +341,7 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
             return <CardActions className={classes.flex_center}>
                 <TableContainer component={Paper}>
                     <Table aria-label="customized table">
-                        <TableHead>
+                        <TableHeadStyle>
                             <TableRow>
                                 <TableCellStyle>Título</TableCellStyle>
                                 <TableCellStyle width={300}>Categoria</TableCellStyle>
@@ -333,39 +349,33 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
                                 <TableCellStyle width={300}>Origem</TableCellStyle>
                                 <TableCellStyle width={75} />
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(!tvShows || tvShows.length === 0) ?
-                                <TableRowStyle hover>
-                                    <TableCellStyle colSpan={5} scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                        {MSG_EMPTY_LIST.toUpperCase()}
+                        </TableHeadStyle>
+                        <TableBodyStyle colSpanValue={5} listData={tvShows} isLoading={showLoading}>
+                            {tvShows && tvShows.map((row, key) => (
+                                <TableRowStyle hover key={key}>
+                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                        {row.title}
                                     </TableCellStyle>
-                                </TableRowStyle> :
-                                tvShows.map((row, key) => (
-                                    <TableRowStyle hover key={key}>
-                                        <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                            {row.title}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {getShowCategories(row)}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {getRelease(row.release)}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {getShowCountries(row)}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="center">
-                                            <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                <ButtonPink sizeBtn='small' actionClick={() => navigate(`${URL_TV_SHOW_SEASONS}/${row._id}`)} title="TEMPORADAS" />
-                                                {row.enabledApproved && <ButtonSuccess sizeBtn='small' actionClick={() => setIdReviewed(row._id)} titleIcon={ICON_OBJECT_LIST.CHECK_ICON} />}
-                                                {row.enabledEdit && <ButtonIndigo sizeBtn='small' actionClick={() => navigate(`${URL_TV_SHOW_EDIT}/${row._id}`)} titleIcon={ICON_OBJECT_LIST.EDIT_ICON} />}
-                                                {row.enabledEdit && <ButtonDanger actionClick={() => setIdDelete(row._id)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} />}
-                                            </ButtonGroup>
-                                        </TableCellStyle>
-                                    </TableRowStyle>
-                                ))}
-                        </TableBody>
+                                    <TableCellStyle align="left">
+                                        {getShowCategories(row)}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {getRelease(row.release)}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {getShowCountries(row)}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="center">
+                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                            <ButtonPink sizeBtn='small' actionClick={() => navigate(`${URL_TV_SHOW_SEASONS}/${row._id}`)} title="TEMPORADAS" />
+                                            {row.enabledApproved && <ButtonSuccess sizeBtn='small' actionClick={() => setIdReviewed(row._id)} titleIcon={ICON_OBJECT_LIST.CHECK_ICON} />}
+                                            {row.enabledEdit && <ButtonIndigo sizeBtn='small' actionClick={() => navigate(`${URL_TV_SHOW_EDIT}/${row._id}`)} titleIcon={ICON_OBJECT_LIST.EDIT_ICON} />}
+                                            {row.enabledEdit && <ButtonDanger actionClick={() => setIdDelete(row._id)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} />}
+                                        </ButtonGroup>
+                                    </TableCellStyle>
+                                </TableRowStyle>
+                            ))}
+                        </TableBodyStyle>
                     </Table>
                 </TableContainer>
             </CardActions>
@@ -459,10 +469,8 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
                             <FormControl>
                                 <RadioGroup aria-labelledby="demo-radio-buttons-group-label" value={orderField} name="radio-buttons-group">
                                     <FormControlLabel value="title" control={<Radio />} label="TÍTULO" onChange={() => orderList("title")} />
-                                    <FormControlLabel value="category" control={<Radio />} label="CATEGORIA" onChange={() => orderList("category")} />
                                     <FormControlLabel value="releaseUp" control={<Radio />} label="LANÇAMENTO CRES." onChange={() => orderList("releaseUp")} />
                                     <FormControlLabel value="releaseDown" control={<Radio />} label="LANÇAMENTO DEC." onChange={() => orderList("releaseDown")} />
-                                    <FormControlLabel value="country" control={<Radio />} label="ORIGEM" onChange={() => orderList("country")} />
                                 </RadioGroup>
                             </FormControl>
                         </Grid>
@@ -479,24 +487,27 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TableContainer component={Paper}>
-                                <Table aria-label="customized table">
-                                    <TableBody>
-                                        {tvShowsBatch && tvShowsBatch.filter(row => row.enabledEdit).map((row, key) => (
-                                            <TableRowStyle hover key={key}
-                                                onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
-                                                <TableCellStyle width={25} align="center">
-                                                    <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
-                                                        onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
-                                                </TableCellStyle>
-                                                <TableCellStyle scope="row" align="left">
-                                                    {row.title}
-                                                </TableCellStyle>
-                                            </TableRowStyle>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            <ScrollInfiniteList isShowScroll={(!tvShowsBatch || (positionScrollBatch * valueInitialScrollBatch) < tvShowsBatch.length)}
+                                updateScroll={() => setPositionScrollBatch((positionScrollBatch + 1))}>
+                                <TableContainer component={Paper}>
+                                    <Table aria-label="customized table">
+                                        <TableBody>
+                                            {tvShowsBatch && getListScroll((positionScrollBatch * valueInitialScrollBatch)).filter(row => row.enabledEdit).map((row, key) => (
+                                                <TableRowStyle hover key={key}
+                                                    onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
+                                                    <TableCellStyle width={25} align="center">
+                                                        <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
+                                                            onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
+                                                    </TableCellStyle>
+                                                    <TableCellStyle scope="row" align="left">
+                                                        {row.title}
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </ScrollInfiniteList>
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -514,7 +525,7 @@ const TvShowListView: React.FC<{ orderDefault: string, tvShows: any, tvShowsBatc
                         <Card>
                             {filterListTvShow()}
                             {getListTvShow()}
-                            <PaginationList valuePage={positionPage} dataList={tvShows} countList={countTvShow} style={{ margin: 5 }}
+                            <PaginationList isLoading={showLoading} valuePage={positionPage} dataList={tvShows} countList={countTvShow} style={{ margin: 5 }}
                                 actionClick={(value: number) => changePagination(value)} />
                         </Card>
                     </Grid>

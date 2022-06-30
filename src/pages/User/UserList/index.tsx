@@ -4,13 +4,13 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { getUsersAll, getUsersAllFilter } from '../../../app/redux/User/user.selector'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { insertMsgs, showLoadingTable } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { URL_USER_UPDATE_PASSWORD } from '../../../app/core/consts'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { getUserAll } from '../../../app/redux/User/user.actions'
 import UserListView from './view'
-import { UserListByOrderAndSearchAndFilter, UserListDeleteBatch, UserListDelete, UserListUpdateEnabled } from './actions'
+import { UserListByOrderAndSearchAndFilter, UserListDelete, UserListUpdateEnabled } from './actions'
 import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function UserList() {
 
@@ -21,14 +21,15 @@ function UserList() {
     const [positionPagination, setPositionPagination] = React.useState(1)
     const users = useSelector(getUsersAllFilter)
     const usersGeneral = useSelector(getUsersAll)
+    const isLoading = useSelector(showStatusLoading)
 
     const orderDefaultValue = "name"
 
     async function refreshList(orderField = orderDefaultValue, searchText = "", levelFilter = "") {
-        await dispatch(showLoading(true))
-        await dispatch(getUserAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingTable(true))
+        await dispatch(getUserAll(() => dispatch(showLoadingTable(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingTable(false))
         }, orderField, searchText, levelFilter))
     }
 
@@ -66,8 +67,8 @@ function UserList() {
     }
 
     return (
-        <UserListView usersBatch={users} positionPage={positionPagination} users={GetListPaginate(users, positionPagination, valueListPaginate)} countUser={getCountPaginate()}
-            changePagination={(value: number) => setPositionPagination(value)}
+        <UserListView positionPage={positionPagination} users={GetListPaginate(users, positionPagination, valueListPaginate)} countUser={getCountPaginate()}
+            showLoading={isLoading} changePagination={(value: number) => setPositionPagination(value)}
             orderDefault={orderDefaultValue} showUpdatePassword={(user) => showUpdatePassword(user)}
             actionChangeSearchText={(orderField: string, searchText: string, levelFilter: string) => dispatch(UserListByOrderAndSearchAndFilter(orderField, searchText, levelFilter, usersGeneral))}
             actionClickFilter={(orderField: string, searchText: string, levelFilter: string) => dispatch(UserListByOrderAndSearchAndFilter(orderField, searchText, levelFilter, usersGeneral))}
@@ -75,8 +76,7 @@ function UserList() {
             actionOrderList={(orderField: string, searchText: string, levelFilter: string) => dispatch(UserListByOrderAndSearchAndFilter(orderField, searchText, levelFilter, usersGeneral))}
             actionRefreshList={(orderField: string, searchText: string, levelFilter: string) => refreshList(orderField, searchText, levelFilter)}
             actionUpdateEnabled={(userId: string, orderField: string, searchText: string, levelFilter: string) => dispatch(UserListUpdateEnabled(userId, orderField, searchText, levelFilter))}
-            actionDeleteRegister={(userId: string, orderField: string, searchText: string, levelFilter: string) => dispatch(UserListDelete(userId, orderField, searchText, levelFilter))}
-            actionDeleteBatch={(arrayDeleteBatch: any, orderField: string, searchText: string, levelFilter: string, dispatchEraseBatch: any) => dispatch(UserListDeleteBatch(arrayDeleteBatch, orderField, searchText, levelFilter, dispatchEraseBatch))} />
+            actionDeleteRegister={(userId: string, orderField: string, searchText: string, levelFilter: string) => dispatch(UserListDelete(userId, orderField, searchText, levelFilter))} />
     )
 }
 

@@ -6,27 +6,24 @@ import LayoutMain from './components/LayoutMain'
 import PageMain from '../pages/App/PageMain'
 import PanelMain from '../pages/App/PanelMain'
 import UnderConstruction from '../pages/App/UnderConstruction'
-import { NavBarMenu } from './components/NavBar'
 import { HeaderMenu } from './components/Header'
 import ICON_OBJECT_LIST from './components/IconList/ICON_OBJECT_LIST'
 import GlobalStyles from './components/GlobalStyles'
 import DialogYesOrNot from './components/Dialog/DialogYesOrNot'
 import FailPage from '../pages/App/FailPage'
-import { getMsgAlert } from './redux/MsgAlert/msgAlert.selector'
-import { statusLoadingMain } from './redux/LoadingMain/loadingMain.selector'
-import { cleanMsgs, insertMsgs } from './redux/MsgAlert/msgAlert.actions'
-import { showLoading } from './redux/LoadingMain/loadingMain.actions'
+import { getMsgAlert, showStatusLoading, showStatusScrollToTop } from './redux/UtlisAppRedux/utlisAppRedux.selector'
+import { cleanMsgs, insertMsgs, showLoadingPattern } from './redux/UtlisAppRedux/utlisAppRedux.actions'
 import {
     MSG_LOGOUT_SYSTEM, MSG_LOGOUT_SYSTEM_ACTION, SYSTEM_API_VERSION, URL_ABOUT_US, URL_ABOUT_US_EDIT, URL_ABOUT_US_NEW, URL_ACTORS, URL_ACTOR_EDIT, URL_ACTOR_NEW,
     URL_CATEGORIES, URL_CATEGORY_EDIT, URL_CATEGORY_NEW, URL_COUNTRIES, URL_COUNTRY_EDIT, URL_COUNTRY_NEW, URL_DIRECTORS, URL_DIRECTOR_EDIT, URL_DIRECTOR_NEW,
     URL_FAIL_PAGE, URL_FORGOT_PASSWORD, URL_MAIN, URL_MOVIES, URL_MOVIE_EDIT, URL_MOVIE_NEW, URL_MY_MOVIES, URL_MY_MOVIE_NEW, URL_MY_TV_SHOWS, URL_MY_TV_SHOW_NEW, URL_PANEL_HOME, URL_RECOVERY_PASSWORD,
     URL_SIGN_IN, URL_SIGN_UP, URL_STREAMS, URL_STREAM_EDIT, URL_STREAM_NEW, URL_TV_SHOWS, URL_TV_SHOW_EDIT, URL_TV_SHOW_EPISODES, URL_TV_SHOW_EPISODE_EDIT,
     URL_TV_SHOW_EPISODE_NEW, URL_TV_SHOW_NEW, URL_TV_SHOW_SEASONS, URL_TV_SHOW_SEASON_EDIT, URL_TV_SHOW_SEASON_NEW, URL_UNDER_CONSTRUCTION, URL_USERS, URL_USER_NEW,
-    URL_USER_AUTH, URL_USER_AUTH_PASSWORD, URL_USER_UPDATE_PASSWORD
+    URL_USER_AUTH, URL_USER_AUTH_PASSWORD, URL_USER_UPDATE_PASSWORD, URL_USERS_TRASH
 } from './core/consts'
-import SignUp from '../pages/User/SignUp'
 import { getUserAccess } from './redux/User/user.selector'
 import { isVerifyUserAndToken, signOutUser } from './redux/User/user.actions'
+import SignUp from '../pages/User/SignUp'
 import SignIn from '../pages/User/SignIn'
 import ForgotPassword from '../pages/User/ForgotPassword'
 import RecoveryPassword from '../pages/User/RecoveryPassword'
@@ -70,6 +67,8 @@ import MyMovieList from '../pages/MyMovie/MyMovieList'
 import MyMovieNew from '../pages/MyMovie/MyMovieNew'
 import MyTvShowList from '../pages/MyTvShow/MyTvShowList'
 import MyTvShowNew from '../pages/MyTvShow/MyTvShowNew'
+import { NavBarMenu } from './components/NavBar'
+import UserListTrash from '../pages/User/UserListTrash'
 
 const mdTheme = createTheme({})
 
@@ -81,7 +80,8 @@ function App() {
 
     const getAuthenticate = useSelector(getUserAccess)
     const msgAlertSelector = useSelector(getMsgAlert)
-    const isLoadingSelector = useSelector(statusLoadingMain)
+    const isLoadingSelector = useSelector(showStatusLoading)
+    const isScrollToTop = useSelector(showStatusScrollToTop)
 
     function actionCleanMsgs() {
         dispatch(cleanMsgs())
@@ -162,7 +162,8 @@ function App() {
     const routes: RouteObject[] = [
         {
             path: URL_MAIN,
-            element: <LayoutMain titleHeaderValue={`APPMOVIE ${SYSTEM_API_VERSION}`} urlSignIn={URL_SIGN_IN} signOutCallback={() => actionSignOut()} cleanMsg={() => actionCleanMsgs()} msgAlert={msgAlertSelector} isLoading={isLoadingSelector}
+            element: <LayoutMain titleHeaderValue={`APPMOVIE ${SYSTEM_API_VERSION}`} urlSignIn={URL_SIGN_IN} signOutCallback={() => actionSignOut()} cleanMsg={() => actionCleanMsgs()} msgAlert={msgAlertSelector}
+                isLoading={isLoadingSelector} isScrollTop={isScrollToTop}
                 menusNavBar={menusNavBar.filter(menu => verifyUser(menu.checkUser, menu.checkLevels, menu.notLevels)).map(menu => menu.menu)}
                 menusHeader={menusHeader.filter(menu => verifyUser(menu.checkUser, menu.checkLevels, menu.notLevels)).map(menu => menu.menu)} />,
             children: [
@@ -176,6 +177,7 @@ function App() {
                 { path: URL_USER_AUTH, element: verifyUserComponent(<UpdateUserAuth />, 1) },
                 { path: URL_USER_AUTH_PASSWORD, element: verifyUserComponent(<UpdateUserAuthPassword />, 1) },
                 { path: URL_USERS, element: verifyUserComponent(<UserList />, 1, ['ADMIN']) },
+                { path: URL_USERS_TRASH, element: verifyUserComponent(<UserListTrash />, 1, ['ADMIN']) },
                 { path: URL_USER_NEW, element: verifyUserComponent(<UserNew />, 1, ['ADMIN']) },
                 { path: `${URL_USERS}/:userId`, element: verifyUserComponent(<UserShow />, 1, ['ADMIN']) },
                 { path: `${URL_USER_UPDATE_PASSWORD}/:userId`, element: verifyUserComponent(<UpdateUserPassword />, 1, ['ADMIN']) },
@@ -234,7 +236,7 @@ function App() {
 
     async function logoutSystem() {
         setShowLogout(false)
-        dispatch(showLoading(true, MSG_LOGOUT_SYSTEM_ACTION))
+        dispatch(showLoadingPattern(true, MSG_LOGOUT_SYSTEM_ACTION))
         dispatch(signOutUser())
     }
 

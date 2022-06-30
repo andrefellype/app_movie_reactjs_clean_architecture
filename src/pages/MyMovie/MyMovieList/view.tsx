@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
-import { Card, CardActions, Grid, TableContainer, Paper, Table, TableHead, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material"
+import { Card, CardActions, Grid, TableContainer, Paper, Table, TableRow, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 import FormControlField from "../../../app/components/FormControl/FormControlField"
@@ -14,11 +14,13 @@ import TableCellStyle from '../../../app/components/Table/TableCellStyle'
 import TableRowStyle from '../../../app/components/Table/TableRowStyle'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
-import { MONTHS, MSG_DELETE_REGISTER_QUESTION, MSG_EMPTY_LIST, URL_MY_MOVIE_NEW } from '../../../app/core/consts'
+import { MONTHS, MSG_DELETE_REGISTER_QUESTION, URL_MY_MOVIE_NEW } from '../../../app/core/consts'
 import FormControlFieldSelect from '../../../app/components/FormControl/FormControlFieldSelect'
 import ConvertDate from '../../../app/components/Utils/ConvertDate'
 import FormControlFieldMask from '../../../app/components/FormControl/FormControlFieldMask'
 import PaginationList from '../../../app/components/PaginationList'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -27,8 +29,8 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionPage: number, countMyMovie: any, changePagination: any, getCategories: any, getCountries: any, actionOrderList: any, actionChangeSearchText: any, actionClickFilter: any, actionEraseFilter: any, actionRefreshList: any, actionDeleteRegister: any }> =
-    function ({ orderDefault, myMovies, countMyMovie, positionPage, changePagination, getCategories, getCountries, actionOrderList, actionChangeSearchText, actionClickFilter, actionEraseFilter, actionRefreshList, actionDeleteRegister }) {
+const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionPage: number, countMyMovie: any, changePagination: any, getCategories: any, getCountries: any, actionOrderList: any, actionChangeSearchText: any, actionClickFilter: any, actionEraseFilter: any, actionRefreshList: any, actionDeleteRegister: any, showLoading: boolean }> =
+    function ({ orderDefault, myMovies, countMyMovie, positionPage, changePagination, getCategories, getCountries, actionOrderList, actionChangeSearchText, actionClickFilter, actionEraseFilter, actionRefreshList, actionDeleteRegister, showLoading }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
@@ -132,16 +134,26 @@ const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionP
             if (getCountries !== null && typeof getCountries !== "undefined") {
                 const countriesValue = [{ label: "SEM PAÍS", value: "-1" }]
                 getCountries.forEach(country => {
-                    countriesValue.push({ label: country.name, value: country._id })
+                    countriesValue.push({ label: country.initial, value: country._id })
                 })
                 setCountries(countriesValue)
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [getCountries])
+        
+        const [typingTimeout, setTypingTimeout] = React.useState<any>(0)
+       
+        function searchFinish(search: string) {
+            actionChangeSearchText(orderField, search, categoryFilter, releaseFilter, durationMinFilter, durationMaxFilter, countryFilter)
+        }
 
         function changeSearchText(search: string) {
             setSearchText(search)
-            actionChangeSearchText(orderField, search, categoryFilter, releaseFilter, durationMinFilter, durationMaxFilter, countryFilter)
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            // eslint-disable-next-line prefer-arrow-callback
+            setTypingTimeout(setTimeout(() => searchFinish(search), 500))
         }
 
         async function refreshList() {
@@ -309,7 +321,7 @@ const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionP
 
         function getShowCountries(rowMovie) {
             if (rowMovie.countries.length > 0) {
-                return rowMovie.countries.reduce((actual, countryOb) => `${actual.length > 0 ? `${actual}, ` : ""}${countryOb.name}`, "")
+                return rowMovie.countries.reduce((actual, countryOb) => `${actual.length > 0 ? `${actual}, ` : ""}${countryOb.initial}`, "")
             }
             return "SEM PAÍS DE ORIGEM"
         }
@@ -328,7 +340,7 @@ const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionP
             return <CardActions className={classes.flex_center}>
                 <TableContainer component={Paper}>
                     <Table aria-label="customized table">
-                        <TableHead>
+                        <TableHeadStyle>
                             <TableRow>
                                 <TableCellStyle>Título</TableCellStyle>
                                 <TableCellStyle width={300}>Categoria</TableCellStyle>
@@ -337,39 +349,33 @@ const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionP
                                 <TableCellStyle width={300}>Origem</TableCellStyle>
                                 <TableCellStyle width={75} />
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(!myMovies || myMovies.length === 0) ?
-                                <TableRowStyle hover>
-                                    <TableCellStyle colSpan={6} scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                        {MSG_EMPTY_LIST.toUpperCase()}
+                        </TableHeadStyle>
+                        <TableBodyStyle colSpanValue={6} listData={myMovies} isLoading={showLoading}>
+                            {myMovies && myMovies.map((row, key) => (
+                                <TableRowStyle hover key={key}>
+                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                        {row.movie ? row.movie.title : ""}
                                     </TableCellStyle>
-                                </TableRowStyle> :
-                                myMovies.map((row, key) => (
-                                    <TableRowStyle hover key={key}>
-                                        <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                            {row.movie ? row.movie.title : ""}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {row.movie ? getShowCategories(row.movie) : ""}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {row.movie ? getRelease(row.movie.release) : ""}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {row.movie ? row.movie.duration.substring(0, 5) : ""}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {row.movie ? getShowCountries(row.movie) : ""}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="center">
-                                            <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                <ButtonDanger actionClick={() => setIdDelete(row.movie_id)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} />
-                                            </ButtonGroup>
-                                        </TableCellStyle>
-                                    </TableRowStyle>
-                                ))}
-                        </TableBody>
+                                    <TableCellStyle align="left">
+                                        {row.movie ? getShowCategories(row.movie) : ""}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {row.movie ? getRelease(row.movie.release) : ""}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {row.movie ? row.movie.duration.substring(0, 5) : ""}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {row.movie ? getShowCountries(row.movie) : ""}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="center">
+                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                            <ButtonDanger actionClick={() => setIdDelete(row.movie_id)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} />
+                                        </ButtonGroup>
+                                    </TableCellStyle>
+                                </TableRowStyle>
+                            ))}
+                        </TableBodyStyle>
                     </Table>
                 </TableContainer>
             </CardActions>
@@ -486,12 +492,10 @@ const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionP
                             <FormControl>
                                 <RadioGroup aria-labelledby="demo-radio-buttons-group-label" value={orderField} name="radio-buttons-group">
                                     <FormControlLabel value="title" control={<Radio />} label="TÍTULO" onChange={() => orderList("title")} />
-                                    <FormControlLabel value="category" control={<Radio />} label="CATEGORIA" onChange={() => orderList("category")} />
                                     <FormControlLabel value="releaseUp" control={<Radio />} label="LANÇAMENTO CRES." onChange={() => orderList("releaseUp")} />
                                     <FormControlLabel value="releaseDown" control={<Radio />} label="LANÇAMENTO DEC." onChange={() => orderList("releaseDown")} />
                                     <FormControlLabel value="durationUp" control={<Radio />} label="DURAÇÃO CRES." onChange={() => orderList("durationUp")} />
                                     <FormControlLabel value="durationDown" control={<Radio />} label="DURAÇÃO DEC." onChange={() => orderList("durationDown")} />
-                                    <FormControlLabel value="country" control={<Radio />} label="ORIGEM" onChange={() => orderList("country")} />
                                 </RadioGroup>
                             </FormControl>
                         </Grid>
@@ -510,7 +514,7 @@ const MyMovieListView: React.FC<{ orderDefault: string, myMovies: any, positionP
                         <Card>
                             {filterListMyMovies()}
                             {getListMyMovies()}
-                            <PaginationList valuePage={positionPage} dataList={myMovies} countList={countMyMovie} style={{ margin: 5 }}
+                            <PaginationList isLoading={showLoading} valuePage={positionPage} dataList={myMovies} countList={countMyMovie} style={{ margin: 5 }}
                                 actionClick={(value: number) => changePagination(value)} />
                         </Card>
                     </Grid>

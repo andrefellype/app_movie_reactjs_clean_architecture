@@ -1,9 +1,7 @@
-/* eslint-disable react/jsx-fragments */
-/* eslint-disable react/jsx-curly-brace-presence */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
-import { ButtonGroup, Card, CardActions, Dialog, DialogActions, DialogContent, Grid, IconButton, InputAdornment, Paper, Table, TableBody, TableContainer, TableHead, TableRow } from "@mui/material"
+import { ButtonGroup, Card, CardActions, Dialog, DialogActions, DialogContent, Grid, IconButton, InputAdornment, Paper, Table, TableContainer, TableRow } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 import PageCard from "../../../app/components/PageCard"
@@ -19,6 +17,9 @@ import TableCellStyle from '../../../app/components/Table/TableCellStyle'
 import DialogYesOrNot from '../../../app/components/Dialog/DialogYesOrNot'
 import ButtonWarning from '../../../app/components/Button/ButtonWarning'
 import ButtonBlueGray from '../../../app/components/Button/ButtonBlueGray'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
+import PaginationList from '../../../app/components/PaginationList'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
 
 const useStyles = makeStyles(() => ({
     button_end: {
@@ -56,8 +57,15 @@ function reducerEpisode(state, action) {
     }
 }
 
-const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, refreshListEpisode: any, refreshListSeason: any, actionChangeSearchTvShow: any, actionRefreshListTvShow: any, saveRegister: any, removeRegister }> =
-    function ({ tvShows, seasons, episodes, refreshListEpisode, refreshListSeason, actionChangeSearchTvShow, actionRefreshListTvShow, saveRegister, removeRegister }) {
+const MyTvShowNewView: React.FC<{
+    tvShows: any, seasons: any, episodes: any, refreshListEpisode: any, refreshListSeason: any, actionChangeSearchTvShow: any, actionRefreshListTvShow: any,
+    saveRegister: any, removeRegister: any, showLoading: boolean, positionPageTvShow: number, countTvShow: any, changePaginationTvShow: any,
+    positionPageSeason: number, countSeason: any, changePaginationSeason: any, positionPageEpisode: number, countEpisode: any, changePaginationEpisode: any
+}> =
+    function ({
+        tvShows, seasons, episodes, refreshListEpisode, refreshListSeason, actionChangeSearchTvShow, actionRefreshListTvShow, saveRegister, removeRegister,
+        showLoading, positionPageTvShow, countTvShow, changePaginationTvShow, positionPageSeason, countSeason, changePaginationSeason,
+        positionPageEpisode, countEpisode, changePaginationEpisode }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
@@ -83,20 +91,17 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
 
         React.useEffect(() => {
             if (tvShowIdTemp.length > 0) {
-                refreshListSeason(tvShowIdTemp, () => {
-                    setShowSeason(true)
-                    setTvShowIdField(tvShowIdTemp)
-                })
+                setTvShowIdField(tvShowIdTemp)
+                refreshListSeason(tvShowIdTemp)
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [tvShowIdTemp])
 
         React.useEffect(() => {
             if (seasonIdTemp.length > 0) {
-                refreshListEpisode(seasonIdTemp, () => {
-                    setShowEpisode(true)
-                    setSeasonIdField(seasonIdTemp)
-                })
+                setSeasonIdField(seasonIdTemp)
+                setShowEpisode(true)
+                refreshListEpisode(seasonIdTemp)
             }
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [seasonIdTemp])
@@ -112,22 +117,28 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
         function insertSeason(seasonId: string, name: string) {
             setShowSeason(false)
             setStatusInsertSeason(seasonId)
-            refreshListEpisode(seasonId, async () => {
-                setSeasonIdField(seasonId)
-                setSeasonNameField(name)
-            })
+            setSeasonIdField(seasonId)
+            setSeasonNameField(name)
+            refreshListEpisode(seasonId)
         }
 
         async function refreshListTvShow() {
-            await setShowTvShow(false)
-            actionRefreshListTvShow(searchTextTvShow, () => {
-                setShowTvShow(true)
-            })
+            actionRefreshListTvShow(searchTextTvShow)
+        }
+
+        const [typingTimeout, setTypingTimeout] = React.useState<any>(0)
+
+        function searchFinish(search: string) {
+            actionChangeSearchTvShow(search)
         }
 
         function changeSearchTvShow(search: string) {
             setSearchTextTvShow(search)
-            actionChangeSearchTvShow(search)
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+            // eslint-disable-next-line prefer-arrow-callback
+            setTypingTimeout(setTimeout(() => searchFinish(search), 500))
         }
 
         function getShowCategories(rowTvShow) {
@@ -139,7 +150,7 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
 
         function getShowCountries(rowTvShow) {
             if (rowTvShow.countries.length > 0) {
-                return rowTvShow.countries.reduce((actual, countryOb) => `${actual.length > 0 ? `${actual}, ` : ""}${countryOb.name}`, "")
+                return rowTvShow.countries.reduce((actual, countryOb) => `${actual.length > 0 ? `${actual}, ` : ""}${countryOb.initial}`, "")
             }
             return "SEM PAÍS DE ORIGEM"
         }
@@ -178,7 +189,7 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
-                                    <TableHead>
+                                    <TableHeadStyle>
                                         <TableRow>
                                             <TableCellStyle colSpan={2}>{`${tvShowTitleField} - ${seasonNameField}`}</TableCellStyle>
                                         </TableRow>
@@ -186,8 +197,8 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                                             <TableCellStyle>Nome</TableCellStyle>
                                             <TableCellStyle width={50} />
                                         </TableRow>
-                                    </TableHead>
-                                    <TableBody>
+                                    </TableHeadStyle>
+                                    <TableBodyStyle colSpanValue={2} listData={episodes} isLoading={showLoading}>
                                         {episodes && episodes.map((row, keyV) => (
                                             <TableRowStyle hover key={keyV}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
@@ -206,9 +217,11 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
-                                    </TableBody>
+                                    </TableBodyStyle>
                                 </Table>
                             </TableContainer>
+                            <PaginationList isLoading={showLoading} valuePage={positionPageEpisode} dataList={episodes} countList={countEpisode} style={{ margin: 5 }}
+                                actionClick={(value: number) => changePaginationEpisode(value)} />
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -231,7 +244,7 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
-                                    <TableHead>
+                                    <TableHeadStyle>
                                         <TableRow>
                                             <TableCellStyle colSpan={2}>{tvShowTitleField}</TableCellStyle>
                                         </TableRow>
@@ -239,8 +252,8 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                                             <TableCellStyle>Nome</TableCellStyle>
                                             <TableCellStyle width={50} />
                                         </TableRow>
-                                    </TableHead>
-                                    <TableBody>
+                                    </TableHeadStyle>
+                                    <TableBodyStyle colSpanValue={2} listData={seasons} isLoading={showLoading}>
                                         {seasons && seasons.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
@@ -260,9 +273,11 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
-                                    </TableBody>
+                                    </TableBodyStyle>
                                 </Table>
                             </TableContainer>
+                            <PaginationList isLoading={showLoading} valuePage={positionPageSeason} dataList={seasons} countList={countSeason} style={{ margin: 5 }}
+                                actionClick={(value: number) => changePaginationSeason(value)} />
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -294,7 +309,7 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
-                                    <TableHead>
+                                    <TableHeadStyle>
                                         <TableRow>
                                             <TableCellStyle>Título</TableCellStyle>
                                             <TableCellStyle width={350}>Categoria</TableCellStyle>
@@ -302,8 +317,8 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                                             <TableCellStyle width={200}>Origem</TableCellStyle>
                                             <TableCellStyle width={50} />
                                         </TableRow>
-                                    </TableHead>
-                                    <TableBody>
+                                    </TableHeadStyle>
+                                    <TableBodyStyle colSpanValue={5} listData={tvShows} isLoading={showLoading}>
                                         {tvShows && tvShows.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
@@ -327,17 +342,19 @@ const MyTvShowNewView: React.FC<{ tvShows: any, seasons: any, episodes: any, ref
                                                                 setTvShowTitleField(row.title)
                                                             } else {
                                                                 setTvShowIdField(row._id)
-                                                                setShowSeason(true)
                                                             }
+                                                            setShowSeason(true)
                                                         }} />
                                                         <ButtonDanger sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CANCEL_ICON} actionClick={() => setIdTvShowRemove(row._id)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
-                                    </TableBody>
+                                    </TableBodyStyle>
                                 </Table>
                             </TableContainer>
+                            <PaginationList isLoading={showLoading} valuePage={positionPageTvShow} dataList={tvShows} countList={countTvShow} style={{ margin: 5 }}
+                                actionClick={(value: number) => changePaginationTvShow(value)} />
                         </Grid>
                     </Grid>
                 </DialogContent>

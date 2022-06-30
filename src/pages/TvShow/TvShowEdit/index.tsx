@@ -2,7 +2,7 @@
 import React from 'react'
 import { useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoadingPattern, insertMsgs } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { MSG_SAVED_DATA, MSG_UPDATE_REGISTER_SUCCESS } from '../../../app/core/consts'
 import { getCategoriesAll, getCategoriesAllFilter } from '../../../app/redux/Category/category.selector'
 import { getCategoryAll } from '../../../app/redux/Category/category.actions'
@@ -14,13 +14,14 @@ import { getCountriesAll, getCountriesAllFilter, getCountrySingle } from '../../
 import { getStreamsAll, getStreamsAllFilter, getStreamSingle } from '../../../app/redux/Stream/stream.selector'
 import { getTvShowSingle } from '../../../app/redux/TvShow/tvshow.selector'
 import { openTvShowById, updateTvShowById } from '../../../app/redux/TvShow/tvshow.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function TvShowEdit() {
 
     const dispatch = useDispatch()
 
     const getTvShow = useSelector(getTvShowSingle)
+    const getLoading = useSelector(showStatusLoading)
 
     const { tvShowId } = useParams()
 
@@ -37,83 +38,91 @@ function TvShowEdit() {
 
     React.useEffect(() => {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            dispatch(showLoading(true))
+            dispatch(showLoadingPattern(true))
             dispatch(getCategoryAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }, ""))
             dispatch(getCountryAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }, 0, ""))
             dispatch(getStreamAll(null, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }, 0, ""))
-            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
+            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListCategory(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, searchText))
         callbackSucess()
     }
 
     async function refreshListCountry(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getCountryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListStream(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function updateRegister(titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string) {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            await dispatch(showLoading(true, MSG_SAVED_DATA))
+            await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
             await dispatch(updateTvShowById(tvShowId, titleValue, releaseValue, categoriesValue, countriesValue, streamsValue, resumeValue, () => {
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
                 dispatch(insertMsgs([MSG_UPDATE_REGISTER_SUCCESS], "success", null, "reload_page"))
             }, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
     }
 
+    function getIsLoading() {
+        if (typeof getLoading !== "undefined" && typeof getLoading.statusPattern !== "undefined") {
+            return getLoading.statusPattern
+        }
+        return false
+    }
+
     return (
-        <TvShowEditView getTvShow={getTvShow}
+        <TvShowEditView getTvShow={getTvShow} isLoading={getIsLoading()}
+
             streams={streams} stream={stream}
             openStream={(idStream: string) => dispatch(TvShowEditStreamOpenById(idStream))}
             actionChangeSearchStream={(searchText: string) => dispatch(TvShowEditStreamBySearch(searchText, streamsGeneral))}
             actionRefreshListStream={(searchText: string, callbackSucess: () => void) => refreshListStream(searchText, callbackSucess)}
-            actionInsertRegisterStream={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditStreamInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterStream={(idStream: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditStreamUpdate(idStream, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterStream={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditStreamInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterStream={(idStream: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditStreamUpdate(idStream, nameValue, callbackSuccess, calllbackError))}
             actionDeleteRegisterStream={(streamId: string, searchText: string, successDestroy: () => void) => dispatch(TvShowEditStreamDelete(streamId, searchText, successDestroy))}
 
             countries={countries} country={country}
             openCountry={(idCountry: string) => dispatch(TvShowEditCountryOpenById(idCountry))}
             actionChangeSearchCountry={(searchText: string) => dispatch(TvShowEditCountryBySearch(searchText, countriesGeneral))}
             actionRefreshListCountry={(searchText: string, callbackSucess: () => void) => refreshListCountry(searchText, callbackSucess)}
-            actionInsertRegisterCountry={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditCountryInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterCountry={(idCountry: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditCountryUpdate(idCountry, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterCountry={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditCountryInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterCountry={(idCountry: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(TvShowEditCountryUpdate(idCountry, nameValue, callbackSuccess, calllbackError))}
             actionDeleteRegisterCountry={(countryId: string, searchText: string, successDestroy: () => void) => dispatch(TvShowEditCountryDelete(countryId, searchText, successDestroy))}
 
             categories={categories} actionChangeSearchCategory={(searchText: string) => dispatch(TvShowEditCategoryBySearch(searchText, categoriesGeneral))}

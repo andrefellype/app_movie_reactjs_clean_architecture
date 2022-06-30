@@ -1,28 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { insertMsgs, showLoadingTable } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { getStreamAll } from '../../../app/redux/Stream/stream.actions'
 import { getStreamsAll, getStreamsAllFilter } from '../../../app/redux/Stream/stream.selector'
 import { StreamListApproved, StreamListBySearch, StreamListDelete, StreamListDeleteBatch } from './actions'
 import StreamListView from './view'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function StreamList() {
 
     const dispatch = useDispatch()
 
-    const valueListPaginate = 6
-    const [positionPagination, setPositionPagination] = React.useState(1)
     const streams = useSelector(getStreamsAllFilter)
     const streamsGeneral = useSelector(getStreamsAll)
+    const isLoading = useSelector(showStatusLoading)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoading(true))
-        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingTable(true))
+        await dispatch(getStreamAll(() => dispatch(showLoadingTable(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingTable(false))
         }, 1, searchText))
     }
 
@@ -31,30 +29,13 @@ function StreamList() {
         // eslint-disable-next-line
     }, [])
 
-    React.useEffect(() => {
-        if (positionPagination > 1) {
-            if (GetListPaginate(streams, positionPagination, valueListPaginate).length === 0) {
-                setPositionPagination((positionPagination - 1))
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [streams])
-
-    function getCountPaginate() {
-        if (streams) {
-            let divid = (streams.length / valueListPaginate)
-            if (!Number.isInteger(divid)) {
-                divid = Math.floor(divid) + 1
-            }
-            return divid
-        }
-        return 0
+    function updateGetListScroll(position) {
+        return streams.slice(0, position)
     }
 
     return (
-        <StreamListView streamsBatch={streams} positionPage={positionPagination} streams={GetListPaginate(streams, positionPagination, valueListPaginate)} countStream={getCountPaginate()}
-            changePagination={(value: number) => setPositionPagination(value)}
-            actionChangeSearchText={(searchText: string) => dispatch(StreamListBySearch(searchText, streamsGeneral))}
+        <StreamListView getListScroll={(positionScroll) => updateGetListScroll(positionScroll)} showLoading={isLoading} streams={streams}
+            actionChangeSearchText={(searchText: string, callbackSuccess: () => void) => dispatch(StreamListBySearch(searchText, callbackSuccess, streamsGeneral))}
             actionRefreshList={(searchText: string) => refreshList(searchText)}
             actionDeleteRegister={(streamId: string, searchText: string) => dispatch(StreamListDelete(streamId, searchText))}
             actionApprovedRegister={(streamId: string, searchText: string) => dispatch(StreamListApproved(streamId, searchText))}

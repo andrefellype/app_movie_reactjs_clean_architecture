@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-underscore-dangle */
 import CryptographyConvert from "../../components/CryptographyConvert"
 import api from "../../core/api"
 import { MY_TV_SHOW_LIST_FILTER_REDUCER, MY_TV_SHOW_LIST_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
@@ -59,15 +62,6 @@ function orderTvShows(myTvShows, type: string) {
                 if (tvShowA.tvShow.title.toLowerCase() < tvShowB.tvShow.title.toLowerCase()) {
                     return -1
                 }
-            } else if (type === "category") {
-                const categoryA = tvShowA.tvShow.categories.length > 0 ? tvShowA.tvShow.categories.reduce((actual, categoryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObA.name}`, "") : "SEM CATEGORIA"
-                const categoryB = tvShowB.tvShow.categories.length > 0 ? tvShowB.tvShow.categories.reduce((actual, categoryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObB.name}`, "") : "SEM CATEGORIA"
-                if (categoryA.toLowerCase() > categoryB.toLowerCase()) {
-                    return 1
-                }
-                if (categoryA.toLowerCase() < categoryB.toLowerCase()) {
-                    return -1
-                }
             } else if (type === "releaseUp" || type === "releaseDown") {
                 const statusOrder = type === "releaseUp"
                 let yearA = tvShowA.tvShow.release.length === 4 ? parseInt(tvShowA.tvShow.release, 10) : 0
@@ -104,15 +98,6 @@ function orderTvShows(myTvShows, type: string) {
                         if (dayA < dayB) return statusOrder ? -1 : 1
                     }
                 }
-            } else if (type === "country") {
-                const countryA = tvShowA.tvShow.countries.length > 0 ? tvShowA.tvShow.countries.reduce((actual, countryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObA.name}`, "") : "SEM PAÍS DE ORIGEM"
-                const countryB = tvShowB.tvShow.countries.length > 0 ? tvShowB.tvShow.countries.reduce((actual, countryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObB.name}`, "") : "SEM PAÍS DE ORIGEM"
-                if (countryA.toLowerCase() > countryB.toLowerCase()) {
-                    return 1
-                }
-                if (countryA.toLowerCase() < countryB.toLowerCase()) {
-                    return -1
-                }
             }
         }
         return 0
@@ -146,6 +131,39 @@ function filterTvShows(myTvShows, categoryId: string, release: string, countryId
             return true
         }
         return false
+    })
+}
+
+export const getMyTvShowDetailsTvShowAll = (myTvShowsGeneral, myTvShowsPagination, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const idsTvShow: any[] = []
+    for (let tg = 0; tg < myTvShowsGeneral.length; tg++) {
+        let statusDetails = false
+        for (let t = 0; t < myTvShowsPagination.length; t++) {
+            if (myTvShowsPagination[t].tvShow._id === myTvShowsGeneral[tg].tvShow._id) {
+                statusDetails = true
+            }
+        }
+        if (statusDetails) {
+            idsTvShow.push(myTvShowsGeneral[tg].tvShow._id)
+        }
+    }
+    await api.post("tvshow/open/details/all", { tvShowIds: idsTvShow, object: { category: true, country: true } }).then(response => {
+        if (response.data.status) {
+            const tvShowsData = response.data.datas
+            const tvShowsNew = myTvShowsGeneral.map(m => {
+                const tvShowsDataFilter = tvShowsData.filter(md => md._id === m.tvShow._id)
+                if (tvShowsDataFilter.length > 0)
+                    m.tvShow = tvShowsDataFilter[0]
+                return m
+            })
+            dispatch({ type: MY_TV_SHOW_LIST_FILTER_REDUCER, myTvShows: tvShowsNew })
+            callbackSuccess()
+        } else {
+            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+        }
+    }).catch(() => {
+        window.location.href = "/failpage/error_api"
     })
 }
 

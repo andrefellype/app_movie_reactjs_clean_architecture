@@ -1,28 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { insertMsgs, showLoadingTable } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import CategoryListView from './view'
 import { getCategoriesAll, getCategoriesAllFilter } from '../../../app/redux/Category/category.selector'
 import { getCategoryAll } from '../../../app/redux/Category/category.actions'
 import { CategoryListBySearch, CategoryListDeleteBatch, CategoryListDelete } from './actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
-import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function CategoryList() {
 
     const dispatch = useDispatch()
 
-    const valueListPaginate = 6
-    const [positionPagination, setPositionPagination] = React.useState(1)
     const categories = useSelector(getCategoriesAllFilter)
     const categoriesGeneral = useSelector(getCategoriesAll)
+    const isLoading = useSelector(showStatusLoading)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoading(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingTable(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoadingTable(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingTable(false))
         }, searchText))
     }
 
@@ -31,31 +29,13 @@ function CategoryList() {
         // eslint-disable-next-line
     }, [])
 
-    React.useEffect(() => {
-        if (positionPagination > 1) {
-            if (GetListPaginate(categories, positionPagination, valueListPaginate).length === 0) {
-                setPositionPagination((positionPagination - 1))
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [categories])
-
-    function getCountPaginate() {
-        if (categories) {
-            let divid = (categories.length / valueListPaginate)
-            if (!Number.isInteger(divid)) {
-                divid = Math.floor(divid) + 1
-            }
-            return divid
-        }
-        return 0
+    function updateGetListScroll(position) {
+        return categories.slice(0, position)
     }
 
     return (
-        <CategoryListView categoriesBatch={categories} positionPage={positionPagination} categories={GetListPaginate(categories, positionPagination, valueListPaginate)} countCategory={getCountPaginate()}
-            changePagination={(value: number) => setPositionPagination(value)}
-            actionChangeSearchText={(searchText: string) => dispatch(CategoryListBySearch(searchText, categoriesGeneral))}
-            actionRefreshList={(searchText: string) => refreshList(searchText)}
+        <CategoryListView getListScroll={(positionScroll) => updateGetListScroll(positionScroll)} showLoading={isLoading} categories={categories}
+            actionChangeSearchText={(searchText: string, callbackSuccess: () => void) => dispatch(CategoryListBySearch(searchText, callbackSuccess, categoriesGeneral))} actionRefreshList={(searchText: string) => refreshList(searchText)}
             actionDeleteRegister={(categoryId: string, searchText: string) => dispatch(CategoryListDelete(categoryId, searchText))}
             actionDeleteBatch={(arrayDeleteBatch: any, searchText: string, dispatchEraseBatch: any) => dispatch(CategoryListDeleteBatch(arrayDeleteBatch, searchText, dispatchEraseBatch))} />
     )

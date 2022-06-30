@@ -2,26 +2,24 @@
 import React from 'react'
 import { useParams } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoadingPattern, insertMsgs, showLoadingTable } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import TvShowEpisodeListView from './view'
 import { TvShowEpisodeListBySearch, TvShowEpisodeListDeleteBatch, TvShowEpisodeListDelete, TvShowEpisodeListApproved } from './actions'
 import { getTvShowSingle } from '../../../app/redux/TvShow/tvshow.selector'
 import { openTvShowById } from '../../../app/redux/TvShow/tvshow.actions'
 import { getTvShowEpisodesAll, getTvShowEpisodesAllFilter } from '../../../app/redux/TvShowEpisode/tvshowepisode.selector'
 import { getTvShowEpisodeAll } from '../../../app/redux/TvShowEpisode/tvshowepisode.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
-import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
 import { getTvShowSeasonSingle } from '../../../app/redux/TvShowSeason/tvshowseason.selector'
 import { openTvShowSeasonById } from '../../../app/redux/TvShowSeason/tvshowseason.actions'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function TvShowEpisodeList() {
 
     const dispatch = useDispatch()
 
-    const valueListPaginate = 6
-    const [positionPagination, setPositionPagination] = React.useState(1)
     const getTvShow = useSelector(getTvShowSingle)
     const getTvShowSeason = useSelector(getTvShowSeasonSingle)
+    const isLoading = useSelector(showStatusLoading)
 
     const episodes = useSelector(getTvShowEpisodesAllFilter)
     const episodesGeneral = useSelector(getTvShowEpisodesAll)
@@ -30,47 +28,27 @@ function TvShowEpisodeList() {
 
     async function refreshList(searchText = "") {
         if (typeof tvShowSeasonId !== "undefined" && tvShowSeasonId !== null) {
-            await dispatch(showLoading(true))
-            await dispatch(getTvShowEpisodeAll(tvShowSeasonId, () => dispatch(showLoading(false)), (errorsMsg) => {
+            await dispatch(showLoadingTable(true))
+            await dispatch(getTvShowEpisodeAll(tvShowSeasonId, () => dispatch(showLoadingTable(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingTable(false))
             }, searchText))
         }
     }
 
     React.useEffect(() => {
-        if (positionPagination > 1) {
-            if (GetListPaginate(episodes, positionPagination, valueListPaginate).length === 0) {
-                setPositionPagination((positionPagination - 1))
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [episodes])
-
-    function getCountPaginate() {
-        if (episodes) {
-            let divid = (episodes.length / valueListPaginate)
-            if (!Number.isInteger(divid)) {
-                divid = Math.floor(divid) + 1
-            }
-            return divid
-        }
-        return 0
-    }
-
-    React.useEffect(() => {
         if (typeof tvShowId !== "undefined" && tvShowId !== null) {
-            dispatch(showLoading(true))
-            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
+            dispatch(showLoadingPattern(true))
+            dispatch(openTvShowById(tvShowId.toString(), () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
         if (typeof tvShowSeasonId !== "undefined" && tvShowSeasonId !== null) {
-            dispatch(showLoading(true))
-            dispatch(openTvShowSeasonById(tvShowSeasonId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
+            dispatch(showLoadingPattern(true))
+            dispatch(openTvShowSeasonById(tvShowSeasonId.toString(), () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
         }
         // eslint-disable-next-line
@@ -81,10 +59,13 @@ function TvShowEpisodeList() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [getTvShow])
 
+    function updateGetListScroll(position) {
+        return episodes.slice(0, position)
+    }
+
     return (
-        <TvShowEpisodeListView episodesBatch={episodes ? episodes.filter(row => row.enabledEdit) : []} positionPage={positionPagination} getTvShow={getTvShow}
-            getTvShowSeason={getTvShowSeason} episodes={GetListPaginate(episodes, positionPagination, valueListPaginate)} countEpisode={getCountPaginate()}
-            changePagination={(value: number) => setPositionPagination(value)}
+        <TvShowEpisodeListView showLoading={isLoading} getTvShow={getTvShow} getListScroll={(positionScroll) => updateGetListScroll(positionScroll)}
+            getTvShowSeason={getTvShowSeason} episodes={episodes}
             actionRefreshList={(searchText: string) => refreshList(searchText)}
             actionChangeSearchText={(searchText: string) => dispatch(TvShowEpisodeListBySearch(searchText, episodesGeneral))}
             actionDeleteRegister={(episodeId: string, searchText: string) => dispatch(TvShowEpisodeListDelete(episodeId, ((typeof tvShowSeasonId !== "undefined") ? tvShowSeasonId.toString() : ""), searchText))}

@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const UserShowView: React.FC<{ getUser: any }> = function ({ getUser }) {
+const UserShowView: React.FC<{ getUser: any, isLoading: boolean }> = function ({ getUser, isLoading }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -38,19 +38,19 @@ const UserShowView: React.FC<{ getUser: any }> = function ({ getUser }) {
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item md={6} xs={12}>
-                                    <FormControlField labelValue="NOME" valueDefault={getUser ? getUser.name : ""} />
+                                    <FormControlField labelValue="NOME" valueDefault={(getUser && !isLoading) ? getUser.name : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={3} xs={12}>
-                                    <FormControlFieldMask valueMask="99/99/9999" labelValue="NASCIMENTO" valueDefault={getUser ? ConvertDate(getUser.birth, "stringEUAToStringBR") : ""} />
+                                    <FormControlFieldMask valueMask="99/99/9999" labelValue="NASCIMENTO" valueDefault={(getUser && !isLoading) ? ConvertDate(getUser.birth, "stringEUAToStringBR") : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={3} xs={12}>
-                                    <FormControlFieldMask valueMask="(99) 99999-9999" labelValue="CELULAR" valueDefault={getUser ? getUser.cellphone : ""} />
+                                    <FormControlFieldMask valueMask="(99) 99999-9999" labelValue="CELULAR" valueDefault={(getUser && !isLoading) ? getUser.cellphone : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={8} xs={12}>
-                                    <FormControlField labelValue="EMAIL" valueDefault={(getUser && getUser.email) ? getUser.email : ""} />
+                                    <FormControlField labelValue="EMAIL" valueDefault={((getUser && !isLoading) && getUser.email) ? getUser.email : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={4} xs={12}>
-                                    <FormControlField labelValue="NÍVEL" valueDefault={getUser ? levels.filter(level => level.value === getUser.level)[0].label : ""} />
+                                    <FormControlField labelValue="NÍVEL" valueDefault={(getUser && !isLoading) ? levels.filter(level => level.value === getUser.level)[0].label : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                             </Grid>
                         </CardActions>

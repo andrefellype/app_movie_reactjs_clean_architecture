@@ -9,9 +9,9 @@ import textNavbar from '../../assets/text_navbar.png'
 const drawerWidth = 240
 export type NavBarMenu = {
     icon?: string, title?: string, badgeText?: string, isNotification?: boolean, isDesktop: boolean, isMobile: boolean,
-    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: () => void | null }[],
-    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: () => void | null }[],
-    collapsables?: { text: string, icon: string, actionClick?: () => void }[], redirectUrl?: string | null, clickOut?: () => void | null
+    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
+    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
+    collapsables?: { text: string, icon: string, redirectUrl?: string | null, actionClick?: (() => void) | null }[], redirectUrl?: string | null, clickOut?: (() => void) | null
 }
 const NavBar: React.FC<{ isMobile: boolean, onMobileNavOpen: () => void, window?: () => Window, menusList: NavBarMenu[] }> = function ({ isMobile, onMobileNavOpen, window, menusList }) {
 

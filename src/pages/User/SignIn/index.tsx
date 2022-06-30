@@ -1,19 +1,18 @@
 import { useDispatch } from 'react-redux'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { insertMsgs, showLoadingPattern } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { MSG_SIGNIN } from '../../../app/core/consts'
 import { signInUser } from '../../../app/redux/User/user.actions'
 import SignInView from './view'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 
 function SignIn() {
 
     const dispatch = useDispatch()
 
     async function login(cellphoneField: string, passwordField: string) {
-        await dispatch(showLoading(true, MSG_SIGNIN))
+        await dispatch(showLoadingPattern(true, MSG_SIGNIN))
         await dispatch(signInUser(cellphoneField, passwordField, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }))
     }
 

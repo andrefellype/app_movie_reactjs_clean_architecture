@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const CategoryEditView: React.FC<{ getCategory: any, update: any }> = function ({ getCategory, update }) {
+const CategoryEditView: React.FC<{ getCategory: any, isLoading: boolean, update: any }> = function ({ getCategory, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -40,12 +40,12 @@ const CategoryEditView: React.FC<{ getCategory: any, update: any }> = function (
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <FormControlField isDisabled={!getCategory} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getCategory || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getCategory} actionClick={() => update(nameField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getCategory && !isLoading)} actionClick={() => update(nameField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_CATEGORIES)} />
                         </CardActions>
                     </Card>

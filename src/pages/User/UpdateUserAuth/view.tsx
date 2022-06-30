@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const UpdateUserAuthView: React.FC<{ getUser: any, update: any }> = function ({ getUser, update }) {
+const UpdateUserAuthView: React.FC<{ getUser: any, isLoading: boolean, update: any }> = function ({ getUser, isLoading, update }) {
 
     const classes = useStyles()
 
@@ -45,21 +45,21 @@ const UpdateUserAuthView: React.FC<{ getUser: any, update: any }> = function ({ 
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item md={8} xs={12}>
-                                    <FormControlField isDisabled={!getUser} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getUser || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                                 <Grid item md={4} xs={12}>
-                                    <FormControlFieldMask isDisabled={!getUser} valueMask="99/99/9999" labelValue="NASCIMENTO*" valueDefault={birthField} onChangeForm={(e) => setBirthField(e.target.value)} />
+                                    <FormControlFieldMask isDisabled={(!getUser || isLoading)} valueMask="99/99/9999" labelValue="NASCIMENTO*" valueDefault={birthField} onChangeForm={(e) => setBirthField(e.target.value)} />
                                 </Grid>
                                 <Grid item md={4} xs={12}>
-                                    <FormControlFieldMask isDisabled={!getUser} valueMask="(99) 99999-9999" labelValue="CELULAR*" valueDefault={cellphoneField} onChangeForm={(e) => setCellphoneField(e.target.value)} />
+                                    <FormControlFieldMask isDisabled={(!getUser || isLoading)} valueMask="(99) 99999-9999" labelValue="CELULAR*" valueDefault={cellphoneField} onChangeForm={(e) => setCellphoneField(e.target.value)} />
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <FormControlField isDisabled={!getUser} labelValue="EMAIL" valueDefault={emailField} onChangeForm={(e) => setEmailField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getUser || isLoading)} labelValue="EMAIL" valueDefault={emailField} onChangeForm={(e) => setEmailField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getUser} actionClick={() => update(nameField, birthField, emailField, cellphoneField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getUser || isLoading)} actionClick={() => update(nameField, birthField, emailField, cellphoneField)} />
                         </CardActions>
                     </Card>
                 </Grid>

@@ -19,7 +19,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const StreamEditView: React.FC<{ getStream: any, update: any }> = function ({ getStream, update }) {
+const StreamEditView: React.FC<{ getStream: any, isLoading: boolean, update: any }> = function ({ getStream, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -40,12 +40,12 @@ const StreamEditView: React.FC<{ getStream: any, update: any }> = function ({ ge
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <FormControlField isDisabled={!getStream} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getStream || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getStream} actionClick={() => update(nameField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getStream || isLoading)} actionClick={() => update(nameField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_STREAMS)} />
                         </CardActions>
                     </Card>

@@ -18,9 +18,7 @@ const StyledTableCell = styled(TableCell)(() => ({
 }))
 
 export default class TableCellStyle extends React.Component<any> {
-
     render() {
-
         const { children, ...other } = this.props
         return (
             <StyledTableCell {...other}>

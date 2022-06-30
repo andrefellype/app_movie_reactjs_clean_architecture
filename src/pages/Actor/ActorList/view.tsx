@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
-import { Card, CardActions, Grid, TableContainer, Paper, Table, TableHead, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox } from "@mui/material"
+import { Card, CardActions, Grid, TableContainer, Paper, Table, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 import FormControlField from "../../../app/components/FormControl/FormControlField"
@@ -14,8 +14,10 @@ import TableCellStyle from '../../../app/components/Table/TableCellStyle'
 import TableRowStyle from '../../../app/components/Table/TableRowStyle'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
-import { MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, MSG_EMPTY_LIST, URL_ACTOR_EDIT, URL_ACTOR_NEW } from '../../../app/core/consts'
-import PaginationList from '../../../app/components/PaginationList'
+import { MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, URL_ACTOR_EDIT, URL_ACTOR_NEW } from '../../../app/core/consts'
+import ScrollInfiniteList from '../../../app/components/ScrollInfiniteList'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -41,12 +43,18 @@ function reducerArrayDeleteBatch(state, action) {
     }
 }
 
-const ActorListView: React.FC<{ actors: any, actorsBatch: any, positionPage: number, countActor: number, changePagination: any, actionChangeSearchText: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any }> =
-    function ({ actors, actorsBatch, positionPage, countActor, changePagination, actionChangeSearchText, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister }) {
+const ActorListView: React.FC<{ actors: any, showLoading: boolean, actionChangeSearchText: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any, getListScroll: (valueScroll: number) => any[] }> =
+    function ({ actors, showLoading, actionChangeSearchText, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister, getListScroll }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
 
+        const valueInitialScroll = 30
+        const valueInitialScrollBatch = 15
+
+        const [positionScroll, setPositionScroll] = React.useState(0)
+        const [positionScrollBatch, setPositionScrollBatch] = React.useState(0)
+        const [listScroll, setListScroll] = React.useState<any[]>([])
         const [idDelete, setIdDelete] = React.useState(-1)
         const [isDeleteBatch, setIsDeleteBatch] = React.useState(false)
         const [idReviewed, setIdReviewed] = React.useState("")
@@ -54,13 +62,24 @@ const ActorListView: React.FC<{ actors: any, actorsBatch: any, positionPage: num
         const [stateArrayDeleteBatch, dispatchArrayDeleteBatch] = React.useReducer(reducerArrayDeleteBatch, { arrayDeleteBatch: [] })
         const [searchText, setSearchText] = React.useState("")
 
+        React.useEffect(() => {
+            if (actors) {
+                setListScroll(getListScroll((positionScroll * valueInitialScroll)))
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [positionScroll, actors])
+
         function changeSearchText(search: string) {
             setSearchText(search)
-            actionChangeSearchText(search)
+            actionChangeSearchText(search, () => {
+                setPositionScroll(1)
+            })
         }
 
         async function refreshList() {
-            actionRefreshList(searchText)
+            actionRefreshList(searchText, () => {
+                setPositionScroll(1)
+            })
         }
 
         function changeDeleteBatch(checked, idActor) {
@@ -100,28 +119,24 @@ const ActorListView: React.FC<{ actors: any, actorsBatch: any, positionPage: num
                     </InputAdornment>
                 }} />
                 <ButtonSuccess style={{ marginLeft: 10 }} titleIcon={ICON_OBJECT_LIST.ADD_ICON} iconTitleSize="medium" actionClick={() => navigate(URL_ACTOR_NEW)} />
-                <ButtonDanger isDisabled={(!actorsBatch || actorsBatch.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
+                <ButtonDanger isDisabled={(!actors || actors.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
             </CardActions>)
         }
 
         function getListActors() {
-            return <CardActions className={classes.flex_center}>
-                <TableContainer component={Paper}>
-                    <Table aria-label="customized table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCellStyle>Nome</TableCellStyle>
-                                <TableCellStyle width={100} />
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(!actors || actors.length === 0) ?
-                                <TableRowStyle hover>
-                                    <TableCellStyle colSpan={2} scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                        {MSG_EMPTY_LIST.toUpperCase()}
-                                    </TableCellStyle>
-                                </TableRowStyle> :
-                                actors.map((row, key) => (
+            return <ScrollInfiniteList isShowScroll={(!actors || (positionScroll * valueInitialScroll) < actors.length)}
+                updateScroll={() => setPositionScroll((positionScroll + 1))}>
+                <CardActions className={classes.flex_center}>
+                    <TableContainer component={Paper}>
+                        <Table aria-label="customized table">
+                            <TableHeadStyle>
+                                <TableRow>
+                                    <TableCellStyle>Nome</TableCellStyle>
+                                    <TableCellStyle width={100} />
+                                </TableRow>
+                            </TableHeadStyle>
+                            <TableBodyStyle isLoading={showLoading} colSpanValue={2} listData={actors}>
+                                {listScroll.map((row, key) => (
                                     <TableRowStyle hover key={key}>
                                         <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                             {row.name}
@@ -135,10 +150,11 @@ const ActorListView: React.FC<{ actors: any, actorsBatch: any, positionPage: num
                                         </TableCellStyle>
                                     </TableRowStyle>
                                 ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </CardActions >
+                            </TableBodyStyle>
+                        </Table>
+                    </TableContainer>
+                </CardActions>
+            </ScrollInfiniteList>
         }
 
         function dialogDeleteBatch() {
@@ -146,24 +162,27 @@ const ActorListView: React.FC<{ actors: any, actorsBatch: any, positionPage: num
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TableContainer component={Paper}>
-                                <Table aria-label="customized table">
-                                    <TableBody>
-                                        {actorsBatch && actorsBatch.map((row, key) => (
-                                            <TableRowStyle hover key={key}
-                                                onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
-                                                <TableCellStyle width={25} align="center">
-                                                    <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
-                                                        onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
-                                                </TableCellStyle>
-                                                <TableCellStyle scope="row" align="left">
-                                                    {row.name}
-                                                </TableCellStyle>
-                                            </TableRowStyle>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            <ScrollInfiniteList isShowScroll={(!actors || (positionScrollBatch * valueInitialScrollBatch) < actors.length)}
+                                updateScroll={() => setPositionScrollBatch((positionScrollBatch + 1))}>
+                                <TableContainer component={Paper}>
+                                    <Table aria-label="customized table">
+                                        <TableBody>
+                                            {actors && getListScroll((positionScrollBatch * valueInitialScrollBatch)).map((row, key) => (
+                                                <TableRowStyle hover key={key}
+                                                    onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
+                                                    <TableCellStyle width={25} align="center">
+                                                        <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
+                                                            onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
+                                                    </TableCellStyle>
+                                                    <TableCellStyle scope="row" align="left">
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </ScrollInfiniteList>
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -181,8 +200,6 @@ const ActorListView: React.FC<{ actors: any, actorsBatch: any, positionPage: num
                         <Card>
                             {filterListActors()}
                             {getListActors()}
-                            <PaginationList dataList={actors} valuePage={positionPage} countList={countActor} style={{ margin: 5 }}
-                                actionClick={(value: number) => changePagination(value)} />
                         </Card>
                     </Grid>
                 </Grid>

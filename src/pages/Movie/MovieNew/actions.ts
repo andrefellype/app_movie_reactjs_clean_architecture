@@ -3,232 +3,246 @@ import { deleteActorById, getActorAll, getActorAllBySearch, openActorById, regis
 import { getCategoryAllBySearch } from "../../../app/redux/Category/category.actions"
 import { deleteCountryById, getCountryAll, getCountryAllBySearch, openCountryById, registerCountry, updateCountryById } from "../../../app/redux/Country/country.actions"
 import { deleteDirectorById, getDirectorAll, getDirectorAllBySearch, openDirectorById, registerDirector, updateDirectorById } from "../../../app/redux/Director/director.actions"
-import { showLoading } from "../../../app/redux/LoadingMain/loadingMain.actions"
-import { insertMsgs } from "../../../app/redux/MsgAlert/msgAlert.actions"
+import { showLoadingPattern, insertMsgs } from "../../../app/redux/UtlisAppRedux/utlisAppRedux.actions"
 import { deleteStreamById, getStreamAll, getStreamAllBySearch, openStreamById, registerStream, updateStreamById } from "../../../app/redux/Stream/stream.actions"
 
 export const MovieNewDirectorOpenById = (idDirector: string) => async dispatch => {
-    await dispatch(showLoading(true))
-    await dispatch(openDirectorById(idDirector, () => dispatch(showLoading(false)), (errorsMsg) => {
+    await dispatch(showLoadingPattern(true))
+    await dispatch(openDirectorById(idDirector, () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
-export const MovieNewDirectorInsert = (nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewDirectorInsert = (nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(registerDirector(nameValue, 0, async () => {
-        await dispatch(showLoading(true))
-        dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        dispatch(getDirectorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
-export const MovieNewDirectorUpdate = (idDirector: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewDirectorUpdate = (idDirector: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(updateDirectorById(idDirector, nameValue, async () => {
-        await dispatch(showLoading(true))
-        await dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getDirectorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
 export const MovieNewDirectorBySearch = (searchText: string, directorsGeneral) => async dispatch => {
-    dispatch(getDirectorAllBySearch(searchText, directorsGeneral))
+    if (searchText.length >= 3)
+        dispatch(getDirectorAllBySearch(searchText, directorsGeneral))
+    else
+        dispatch(getDirectorAllBySearch(searchText, []))
 }
 
 export const MovieNewDirectorDelete = (directorId: string, searchText: string, successDestroy: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(showLoadingPattern(true, MSG_DELETE_REGISTER))
     await dispatch(deleteDirectorById(directorId, () => {
-        dispatch(showLoading(true))
-        dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(showLoadingPattern(true))
+        dispatch(getDirectorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         successDestroy()
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
 export const MovieNewCastBySearch = (searchText: string, directorsGeneral) => async dispatch => {
-    dispatch(getActorAllBySearch(searchText, directorsGeneral))
+    if (searchText.length >= 3)
+        dispatch(getActorAllBySearch(searchText, directorsGeneral))
+    else
+        dispatch(getActorAllBySearch(searchText, []))
 }
 
-export const MovieNewCastInsertActor = (nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewCastInsertActor = (nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(registerActor(nameValue, 0, async () => {
-        dispatch(getActorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(getActorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
-export const MovieNewCastUpdateActor = (idActor: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewCastUpdateActor = (idActor: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(updateActorById(idActor, nameValue, async () => {
-        await dispatch(getActorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(getActorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
 export const MovieNewCastDeleteActor = (actorId: string, searchText: string, successDestroy: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(showLoadingPattern(true, MSG_DELETE_REGISTER))
     await dispatch(deleteActorById(actorId, () => {
-        dispatch(showLoading(true))
-        dispatch(getActorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(showLoadingPattern(true))
+        dispatch(getActorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         successDestroy()
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
 export const MovieNewActorOpenById = (idActor: string) => async dispatch => {
-    await dispatch(showLoading(true))
-    await dispatch(openActorById(idActor, () => dispatch(showLoading(false)), (errorsMsg) => {
+    await dispatch(showLoadingPattern(true))
+    await dispatch(openActorById(idActor, () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
 export const MovieNewCategoryBySearch = (searchText: string, categoriesGeneral) => async dispatch => {
-    dispatch(getCategoryAllBySearch(searchText, categoriesGeneral))
+    if (searchText.length >= 3)
+        dispatch(getCategoryAllBySearch(searchText, categoriesGeneral))
+    else
+        dispatch(getCategoryAllBySearch(searchText, []))
 }
 
 export const MovieNewCountryBySearch = (searchText: string, countriesGeneral) => async dispatch => {
-    dispatch(getCountryAllBySearch(searchText, countriesGeneral))
+    if (searchText.length >= 3)
+        dispatch(getCountryAllBySearch(searchText, countriesGeneral))
+    else
+        dispatch(getCountryAllBySearch(searchText, []))
 }
 
-export const MovieNewCountryInsert = (nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewCountryInsert = (nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(registerCountry(nameValue, 0, async () => {
-        dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(getCountryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
-export const MovieNewCountryUpdate = (idCountry: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewCountryUpdate = (idCountry: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(updateCountryById(idCountry, nameValue, async () => {
-        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(getCountryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
 export const MovieNewCountryDelete = (countryId: string, searchText: string, successDestroy: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(showLoadingPattern(true, MSG_DELETE_REGISTER))
     await dispatch(deleteCountryById(countryId, () => {
-        dispatch(showLoading(true))
-        dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(showLoadingPattern(true))
+        dispatch(getCountryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         successDestroy()
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
 export const MovieNewCountryOpenById = (idCountry: string) => async dispatch => {
-    await dispatch(showLoading(true))
-    await dispatch(openCountryById(idCountry, () => dispatch(showLoading(false)), (errorsMsg) => {
+    await dispatch(showLoadingPattern(true))
+    await dispatch(openCountryById(idCountry, () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
 export const MovieNewStreamBySearch = (searchText: string, streamsGeneral) => async dispatch => {
-    dispatch(getStreamAllBySearch(searchText, streamsGeneral))
+    if (searchText.length >= 3)
+        dispatch(getStreamAllBySearch(searchText, streamsGeneral))
+    else
+        dispatch(getStreamAllBySearch(searchText, []))
 }
 
-export const MovieNewStreamInsert = (nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewStreamInsert = (nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(registerStream(nameValue, 0, async () => {
-        dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
-export const MovieNewStreamUpdate = (idStream: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_SAVED_DATA))
+export const MovieNewStreamUpdate = (idStream: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => async dispatch => {
+    await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
     await dispatch(updateStreamById(idStream, nameValue, async () => {
-        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
-        }, 0, searchText))
+            dispatch(showLoadingPattern(false))
+        }, 0, nameValue.substring(0, 3)))
         callbackSuccess()
     }, async () => {
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
         calllbackError()
     }))
 }
 
 export const MovieNewStreamDelete = (streamId: string, searchText: string, successDestroy: () => void) => async dispatch => {
-    await dispatch(showLoading(true, MSG_DELETE_REGISTER))
+    await dispatch(showLoadingPattern(true, MSG_DELETE_REGISTER))
     await dispatch(deleteStreamById(streamId, () => {
-        dispatch(showLoading(true))
-        dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(showLoadingPattern(true))
+        dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         successDestroy()
     }, (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }
 
 export const MovieNewStreamOpenById = (idStream: string) => async dispatch => {
-    await dispatch(showLoading(true))
-    await dispatch(openStreamById(idStream, () => dispatch(showLoading(false)), (errorsMsg) => {
+    await dispatch(showLoadingPattern(true))
+    await dispatch(openStreamById(idStream, () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
         dispatch(insertMsgs(errorsMsg, 'error'))
-        dispatch(showLoading(false))
+        dispatch(showLoadingPattern(false))
     }))
 }

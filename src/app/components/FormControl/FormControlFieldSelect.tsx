@@ -14,7 +14,7 @@ export default class FormControlFieldSelect extends React.Component<{
 
         return (
             <FormControl fullWidth>
-                <TextField size={sizeValue} variant={variantValue} multiline={isMultiline} maxRows={totalRows} disabled={isDisabled} label={labelValue} value={valueDefault} select onChange={onChangeForm} {...other}>
+                <TextField size={sizeValue} variant={variantValue} multiline={isMultiline} maxRows={totalRows} disabled={isDisabled} label={labelValue} value={!isDisabled ? valueDefault : ""} select onChange={onChangeForm} {...other}>
                     {selectList.map((option, key) => (
                         <MenuItem key={key} value={option.value}>
                             {option.label}

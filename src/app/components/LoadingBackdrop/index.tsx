@@ -13,7 +13,7 @@ const styles = (theme) => ({
     }
 })
 
-class LoadingBackdrop extends React.Component<{ loadingObject: { title: string } }> {
+class LoadingBackdrop extends React.Component<{ loadingObject: { titlePattern: string } }> {
 
     render() {
 
@@ -28,7 +28,7 @@ class LoadingBackdrop extends React.Component<{ loadingObject: { title: string }
                                 <CircularProgress color="primary" size={30} />
                             </Grid>
                             <Grid item style={{ fontWeight: 'bold', fontSize: 20 }}>
-                                {loadingObject.title}
+                                {loadingObject.titlePattern}
                             </Grid>
                         </Grid>
                     </CardContent>

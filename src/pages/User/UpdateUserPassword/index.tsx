@@ -3,12 +3,12 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router'
 import { getUserSingle } from '../../../app/redux/User/user.selector'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { insertMsgs, showLoadingPattern } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { openUserById, updatePasswordById } from '../../../app/redux/User/user.actions'
 import { MSG_SAVED_DATA, MSG_UPDATE_PASSWORD_SUCCESS, URL_PANEL_HOME, USER_LOCAL_STORAGE } from '../../../app/core/consts'
 import CryptographyConvert from '../../../app/components/CryptographyConvert'
 import UpdateUserPasswordView from './view'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 
 function UpdateUserPassword() {
 
@@ -18,6 +18,7 @@ function UpdateUserPassword() {
     const { userId } = useParams()
 
     const getUser = useSelector(getUserSingle)
+    const getLoading = useSelector(showStatusLoading)
 
     async function verifyIdUser() {
         const userLocal = await localStorage.getItem(USER_LOCAL_STORAGE)
@@ -43,9 +44,9 @@ function UpdateUserPassword() {
 
     React.useEffect(() => {
         if (userId !== null && typeof userId !== "undefined") {
-            dispatch(showLoading(true))
-            dispatch(openUserById(userId.toString(), () => dispatch(showLoading(false)), (errorsMsg) => {
-                dispatch(showLoading(false))
+            dispatch(showLoadingPattern(true))
+            dispatch(openUserById(userId.toString(), () => dispatch(showLoadingPattern(false)), (errorsMsg) => {
+                dispatch(showLoadingPattern(false))
                 dispatch(insertMsgs(errorsMsg, 'error'))
             }, (userActual) => verifyLevelUser(userActual)))
         }
@@ -54,19 +55,27 @@ function UpdateUserPassword() {
 
     async function updateUser(passwordField: string, confirmPasswordField: string) {
         if (userId !== null && typeof userId !== "undefined") {
-            await dispatch(showLoading(true, MSG_SAVED_DATA))
+            await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
             await dispatch(updatePasswordById(userId.toString(), passwordField, confirmPasswordField, () => {
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
                 dispatch(insertMsgs([MSG_UPDATE_PASSWORD_SUCCESS], "success", null, "reload_page"))
             }, (errorMsg) => {
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
                 dispatch(insertMsgs(errorMsg, 'error'))
             }))
         }
     }
 
+    function getIsLoading() {
+        if (typeof getLoading !== "undefined" && typeof getLoading.statusPattern !== "undefined") {
+            return getLoading.statusPattern
+        }
+        return false
+    }
+
     return (
-        <UpdateUserPasswordView getUser={getUser} update={(passwordField: string, confirmPasswordField: string) => updateUser(passwordField, confirmPasswordField)} />
+        <UpdateUserPasswordView isLoading={getIsLoading()} getUser={getUser}
+            update={(passwordField: string, confirmPasswordField: string) => updateUser(passwordField, confirmPasswordField)} />
     )
 }
 

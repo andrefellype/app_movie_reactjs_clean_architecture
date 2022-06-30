@@ -223,7 +223,7 @@ const TvShowNewView: React.FC<{
 
         React.useEffect(() => {
             if (country) {
-                setIdCountryEditName(country.name)
+                setIdCountryEditName(country.initial)
             }
         }, [country])
 
@@ -269,7 +269,7 @@ const TvShowNewView: React.FC<{
 
         function changeCountry(checked, rowCountry) {
             if (checked) {
-                dispatchCountry({ type: 'add', _id: rowCountry._id, name: rowCountry.name })
+                dispatchCountry({ type: 'add', _id: rowCountry._id, name: rowCountry.initial })
             } else {
                 dispatchCountry({ type: 'remove', _id: rowCountry._id })
             }
@@ -289,27 +289,31 @@ const TvShowNewView: React.FC<{
 
         function updateRegisterCountry() {
             const idCountry = idCountryEdit
-            if (idCountry.length > 0) {
-                setIdCountryEdit("")
-                setShowCountry(false)
-                if (idCountry === "0") {
-                    actionInsertRegisterCountry(idCountryEditName, searchTextCountry, () => {
-                        setIdCountryEditName("")
-                        setIdCountryEdit("")
-                        setShowCountry(true)
-                    }, () => {
-                        setShowCountry(true)
-                        setIdCountryEdit(idCountry)
-                    })
-                } else {
-                    actionUpdateRegisterCountry(idCountry, idCountryEditName, searchTextCountry, () => {
-                        dispatchCountry({ type: 'replaceName', _id: idCountry, name: idCountryEditName })
-                        setIdCountryEdit("")
-                        setShowCountry(true)
-                    }, () => {
-                        setShowCountry(true)
-                        setIdCountryEdit(idCountry)
-                    })
+            if (idCountryEditName.length >= 3) {
+                if (idCountry.length > 0) {
+                    setIdCountryEdit("")
+                    setShowCountry(false)
+                    if (idCountry === "0") {
+                        actionInsertRegisterCountry(idCountryEditName, () => {
+                            setIdCountryEditName("")
+                            setIdCountryEdit("")
+                            setShowCountry(true)
+                            setSearchTextCountry(idCountryEditName.substring(0, 3))
+                        }, () => {
+                            setShowCountry(true)
+                            setIdCountryEdit(idCountry)
+                        })
+                    } else {
+                        actionUpdateRegisterCountry(idCountry, idCountryEditName, () => {
+                            dispatchCountry({ type: 'replaceName', _id: idCountry, name: idCountryEditName })
+                            setIdCountryEdit("")
+                            setShowCountry(true)
+                            setSearchTextCountry(idCountryEditName.substring(0, 3))
+                        }, () => {
+                            setShowCountry(true)
+                            setIdCountryEdit(idCountry)
+                        })
+                    }
                 }
             }
         }
@@ -333,27 +337,31 @@ const TvShowNewView: React.FC<{
 
         function updateRegisterStream() {
             const idStream = idStreamEdit
-            if (idStream.length > 0) {
-                setIdStreamEdit("")
-                setShowStream(false)
-                if (idStream === "0") {
-                    actionInsertRegisterStream(idStreamEditName, searchTextStream, () => {
-                        setIdStreamEditName("")
-                        setIdStreamEdit("")
-                        setShowStream(true)
-                    }, () => {
-                        setShowStream(true)
-                        setIdStreamEdit(idStream)
-                    })
-                } else {
-                    actionUpdateRegisterStream(idStream, idStreamEditName, searchTextStream, () => {
-                        dispatchStream({ type: 'replaceName', _id: idStream, name: idStreamEditName })
-                        setIdStreamEdit("")
-                        setShowStream(true)
-                    }, () => {
-                        setShowStream(true)
-                        setIdStreamEdit(idStream)
-                    })
+            if (idStreamEditName.length >= 3) {
+                if (idStream.length > 0) {
+                    setIdStreamEdit("")
+                    setShowStream(false)
+                    if (idStream === "0") {
+                        actionInsertRegisterStream(idStreamEditName, () => {
+                            setIdStreamEditName("")
+                            setIdStreamEdit("")
+                            setShowStream(true)
+                            setSearchTextStream(idStreamEditName.substring(0, 3))
+                        }, () => {
+                            setShowStream(true)
+                            setIdStreamEdit(idStream)
+                        })
+                    } else {
+                        actionUpdateRegisterStream(idStream, idStreamEditName, () => {
+                            dispatchStream({ type: 'replaceName', _id: idStream, name: idStreamEditName })
+                            setIdStreamEdit("")
+                            setShowStream(true)
+                            setSearchTextStream(idStreamEditName.substring(0, 3))
+                        }, () => {
+                            setShowStream(true)
+                            setIdStreamEdit(idStream)
+                        })
+                    }
                 }
             }
         }
@@ -427,37 +435,49 @@ const TvShowNewView: React.FC<{
                     <FormControlField valueDefault={searchTextCategory} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchCategory(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextCategory.length > 0 && <IconButton edge="end" onClick={() => changeSearchCategory("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListCategory()}>
+                            {searchTextCategory.length >= 3 && <IconButton edge="end" onClick={() => refreshListCategory()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateCategory.categories.length > 0 || searchTextCategory.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {categories && categories.map((row, key) => (
+                                        {stateCategory.categories.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
-                                                <TableCellStyle width={50} align="center">
+                                                <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {stateCategory.categories.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCategories(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCategories(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCategories(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(searchTextCategory.length >= 3 && categories) && categories.filter(ca => stateCategory.categories.filter(c => c._id === ca._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={50} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCategories(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonDanger title="FECHAR" actionClick={() => setShowCategory(false)} />
                 </DialogActions>
@@ -490,39 +510,51 @@ const TvShowNewView: React.FC<{
                     <FormControlField valueDefault={searchTextCountry} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchCountry(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextCountry.length > 0 && <IconButton edge="end" onClick={() => changeSearchCountry("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListCountry()}>
+                            {searchTextCountry.length >= 3 && <IconButton edge="end" onClick={() => refreshListCountry()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateCountry.countries.length > 0 || searchTextCountry.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {countries && countries.map((row, key) => (
+                                        {stateCountry.countries.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
                                                 <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdCountryEdit(row._id)} />}
-                                                        {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdCountryDelete(row._id)} />}
-                                                        {stateCountry.countries.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCountry(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCountry(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeCountry(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(countries && searchTextCountry.length >= 3) && countries.filter(co => stateCountry.countries.filter(c => c._id === co._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.initial}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={100} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdCountryEdit(row._id)} />}
+                                                            {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdCountryDelete(row._id)} />}
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeCountry(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonSuccess title="REGISTRAR NOVO PAÍS" actionClick={() => {
                         setIdCountryEditName("")
@@ -559,39 +591,51 @@ const TvShowNewView: React.FC<{
                     <FormControlField valueDefault={searchTextStream} labelValue="DIGITE O NOME" onChangeForm={(e) => changeSearchStream(e.target.value)} InputProps={{
                         endAdornment: <InputAdornment position="end">
                             {searchTextStream.length > 0 && <IconButton edge="end" onClick={() => changeSearchStream("")}><IconList icon={ICON_OBJECT_LIST.CLEAR_ICON} /></IconButton>}
-                            <IconButton edge="end" onClick={() => refreshListStream()}>
+                            {searchTextStream.length >= 3 && <IconButton edge="end" onClick={() => refreshListStream()}>
                                 <IconList icon={ICON_OBJECT_LIST.REFRESH_ICON} />
-                            </IconButton>
+                            </IconButton>}
                         </InputAdornment>
                     }} />
                 </DialogActions>
-                <DialogContent>
+                {(stateStream.streams.length > 0 || searchTextStream.length >= 3) && <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TableContainer component={Paper}>
                                 <Table aria-label="customized table">
                                     <TableBody>
-                                        {streams && streams.map((row, key) => (
+                                        {stateStream.streams.map((row, key) => (
                                             <TableRowStyle hover key={key}>
                                                 <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                                     {row.name}
                                                 </TableCellStyle>
                                                 <TableCellStyle width={100} align="center">
                                                     <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                        {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdStreamEdit(row._id)} />}
-                                                        {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdStreamDelete(row._id)} />}
-                                                        {stateStream.streams.filter(d => d._id === row._id).length === 0 ? <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeStream(true, row)} />
-                                                            : <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeStream(false, row)} />}
+                                                        <ButtonWarning sizeBtn='small' titleIcon={ICON_OBJECT_LIST.REMOVE_ICON} actionClick={() => changeStream(false, row)} />
                                                     </ButtonGroup>
                                                 </TableCellStyle>
                                             </TableRowStyle>
                                         ))}
+                                        {(searchTextStream.length >= 3 && streams) && streams.filter(st => stateStream.streams.filter(s => s._id === st._id).length === 0)
+                                            .map((row, key) => (
+                                                <TableRowStyle hover key={key}>
+                                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                    <TableCellStyle width={100} align="center">
+                                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                                            {row.enabledEdit && <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.EDIT_ICON} actionClick={() => setIdStreamEdit(row._id)} />}
+                                                            {row.enabledEdit && <ButtonPink sizeBtn='small' titleIcon={ICON_OBJECT_LIST.DELETE_ICON} actionClick={() => setIdStreamDelete(row._id)} />}
+                                                            <ButtonSuccess sizeBtn='small' titleIcon={ICON_OBJECT_LIST.CHECK_ICON} actionClick={() => changeStream(true, row)} />
+                                                        </ButtonGroup>
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
                         </Grid>
                     </Grid>
-                </DialogContent>
+                </DialogContent>}
                 <DialogActions>
                     <ButtonSuccess title="REGISTRAR NOVO STREAM" actionClick={() => {
                         setIdStreamEditName("")

@@ -21,7 +21,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const TvShowSeasonEditView: React.FC<{ getTvShow: any, getSeason: any, update: any }> = function ({ getTvShow, getSeason, update }) {
+const TvShowSeasonEditView: React.FC<{ getTvShow: any, getSeason: any, isLoading: boolean, update: any }> = function ({ getTvShow, getSeason, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -45,12 +45,12 @@ const TvShowSeasonEditView: React.FC<{ getTvShow: any, getSeason: any, update: a
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
-                                    <FormControlField isDisabled={!getSeason} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
+                                    <FormControlField isDisabled={(!getSeason || isLoading)} labelValue="NOME*" valueDefault={nameField} onChangeForm={(e) => setNameField(e.target.value)} />
                                 </Grid>
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getSeason} actionClick={() => update(nameField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getSeason || isLoading)} actionClick={() => update(nameField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(`${URL_TV_SHOW_SEASONS}/${getTvShow ? getTvShow._id : ""}`)} />
                         </CardActions>
                     </Card>

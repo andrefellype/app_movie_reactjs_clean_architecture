@@ -7,9 +7,9 @@ const drawerWidth = 240
 
 export type HeaderMenu = {
     icon?: string, title?: string, badgeText?: string, isNotification?: boolean, isDesktop: boolean, isMobile: boolean,
-    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: () => void | null }[],
-    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: () => void | null }[],
-    redirectUrl?: string | null, clickOut?: () => void | null,
+    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
+    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
+    redirectUrl?: string | null, clickOut?: (() => void) | null,
 }
 const Header: React.FC<{ onMobileNavOpen: () => void, titleHeader?: string | null, menusList: HeaderMenu[] }> = function ({ onMobileNavOpen, titleHeader, menusList }) {
 

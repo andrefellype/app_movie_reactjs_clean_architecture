@@ -13,7 +13,6 @@ const StyledTableRow = styled(TableRow)(() => ({
 export default class TableRowStyle extends React.Component<any> {
     render() {
         const { children, ...other } = this.props
-
         return (
             <StyledTableRow {...other}>
                 {children}

@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import GetListPaginate from '../../../app/components/Utils/GetListPaginate'
 import { getActorAll } from '../../../app/redux/Actor/actor.actions'
 import { getActorsAll, getActorsAllFilter } from '../../../app/redux/Actor/actor.selector'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
+import { insertMsgs, showLoadingTable } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
+import { showStatusLoading } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.selector'
 import { ActorListApproved, ActorListBySearch, ActorListDelete, ActorListDeleteBatch } from './actions'
 import ActorListView from './view'
 
@@ -13,15 +12,14 @@ function ActorList() {
 
     const dispatch = useDispatch()
 
-    const valueListPaginate = 6
-    const [positionPagination, setPositionPagination] = React.useState(1)
     const actors = useSelector(getActorsAllFilter)
     const actorsGeneral = useSelector(getActorsAll)
+    const isLoading = useSelector(showStatusLoading)
 
     async function refreshList(searchText = "") {
-        await dispatch(showLoading(true))
-        await dispatch(getActorAll(() => dispatch(showLoading(false)), (errorMsg) => {
-            dispatch(showLoading(false))
+        await dispatch(showLoadingTable(true))
+        await dispatch(getActorAll(() => dispatch(showLoadingTable(false)), (errorMsg) => {
+            dispatch(showLoadingTable(false))
             dispatch(insertMsgs(errorMsg, 'error'))
         }, 1, searchText))
     }
@@ -31,30 +29,13 @@ function ActorList() {
         // eslint-disable-next-line
     }, [])
 
-    React.useEffect(() => {
-        if (positionPagination > 1) {
-            if (GetListPaginate(actors, positionPagination, valueListPaginate).length === 0) {
-                setPositionPagination((positionPagination - 1))
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [actors])
-
-    function getCountPaginate() {
-        if (actors) {
-            let divid = (actors.length / valueListPaginate)
-            if (!Number.isInteger(divid)) {
-                divid = Math.floor(divid) + 1
-            }
-            return divid
-        }
-        return 0
+    function updateGetListScroll(position) {
+        return actors.slice(0, position)
     }
 
     return (
-        <ActorListView actorsBatch={actors} positionPage={positionPagination} actors={GetListPaginate(actors, positionPagination, valueListPaginate)} countActor={getCountPaginate()}
-            changePagination={(value: number) => setPositionPagination(value)}
-            actionChangeSearchText={(searchText: string) => dispatch(ActorListBySearch(searchText, actorsGeneral))}
+        <ActorListView showLoading={isLoading} getListScroll={(positionScroll) => updateGetListScroll(positionScroll)} actors={actors}
+            actionChangeSearchText={(searchText: string, callbackSuccess: () => void) => dispatch(ActorListBySearch(searchText, callbackSuccess, actorsGeneral))}
             actionRefreshList={(searchText: string) => refreshList(searchText)}
             actionDeleteRegister={(actorId: string, searchText: string) => dispatch(ActorListDelete(actorId, searchText))}
             actionApprovedRegister={(actorId: string, searchText: string) => dispatch(ActorListApproved(actorId, searchText))}

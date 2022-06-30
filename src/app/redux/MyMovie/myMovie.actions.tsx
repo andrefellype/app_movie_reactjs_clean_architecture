@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-underscore-dangle */
 import CryptographyConvert from "../../components/CryptographyConvert"
 import api from "../../core/api"
 import { MY_MOVIE_LIST_FILTER_REDUCER, MY_MOVIE_LIST_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
@@ -59,15 +62,6 @@ function orderMovies(myMovies, type: string) {
                 if (myMovieA.movie.title.toLowerCase() < myMovieB.movie.title.toLowerCase()) {
                     return -1
                 }
-            } else if (type === "category") {
-                const categoryA = myMovieA.movie.categories.length > 0 ? myMovieA.movie.categories.reduce((actual, categoryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObA.name}`, "") : "SEM CATEGORIA"
-                const categoryB = myMovieB.movie.categories.length > 0 ? myMovieB.movie.categories.reduce((actual, categoryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObB.name}`, "") : "SEM CATEGORIA"
-                if (categoryA.toLowerCase() > categoryB.toLowerCase()) {
-                    return 1
-                }
-                if (categoryA.toLowerCase() < categoryB.toLowerCase()) {
-                    return -1
-                }
             } else if (type === "releaseUp" || type === "releaseDown") {
                 const statusOrder = type === "releaseUp"
                 let yearA = myMovieA.movie.release.length === 4 ? parseInt(myMovieA.movie.release, 10) : 0
@@ -115,15 +109,6 @@ function orderMovies(myMovies, type: string) {
                 if (hourA === hourB) {
                     if (minuteA > minuteB) return statusOrder ? 1 : -1
                     if (minuteA < minuteB) return statusOrder ? -1 : 1
-                }
-            } else if (type === "country") {
-                const countryA = myMovieA.movie.countries.length > 0 ? myMovieA.movie.countries.reduce((actual, countryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObA.name}`, "") : "SEM PAÍS DE ORIGEM"
-                const countryB = myMovieB.movie.countries.length > 0 ? myMovieB.movie.countries.reduce((actual, countryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObB.name}`, "") : "SEM PAÍS DE ORIGEM"
-                if (countryA.toLowerCase() > countryB.toLowerCase()) {
-                    return 1
-                }
-                if (countryA.toLowerCase() < countryB.toLowerCase()) {
-                    return -1
                 }
             }
         }
@@ -178,6 +163,39 @@ function filterMovies(myMovies, categoryId: string, release: string, durationMin
             return true
         }
         return false
+    })
+}
+
+export const getMyMovieDetailsMovieAll = (myMoviesGeneral, myMoviesPagination, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const idsMovie: any[] = []
+    for (let mg = 0; mg < myMoviesGeneral.length; mg++) {
+        let statusDetails = false
+        for (let m = 0; m < myMoviesPagination.length; m++) {
+            if (myMoviesPagination[m].movie_id === myMoviesGeneral[mg].movie_id) {
+                statusDetails = true
+            }
+        }
+        if (statusDetails) {
+            idsMovie.push(myMoviesGeneral[mg].movie_id)
+        }
+    }
+    await api.post("movie/open/details/all", { movieIds: idsMovie, object: { category: true, country: true } }).then(response => {
+        if (response.data.status) {
+            const moviesData = response.data.datas
+            const moviesNew = myMoviesGeneral.map(m => {
+                const moviesDataFilter = moviesData.filter(md => md._id === m.movie_id)
+                if (moviesDataFilter.length > 0)
+                    m.movie = moviesDataFilter[0]
+                return m
+            })
+            dispatch({ type: MY_MOVIE_LIST_FILTER_REDUCER, myMovies: moviesNew })
+            callbackSuccess()
+        } else {
+            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+        }
+    }).catch(() => {
+        window.location.href = "/failpage/error_api"
     })
 }
 

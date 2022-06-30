@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import CryptographyConvert from "../../components/CryptographyConvert"
 import api from "../../core/api"
 import { MOVIE_LIST_FILTER_REDUCER, MOVIE_LIST_REDUCER, MOVIE_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
@@ -110,15 +111,6 @@ function orderMovies(movies, type: string) {
             if (movieA.title.toLowerCase() < movieB.title.toLowerCase()) {
                 return -1
             }
-        } else if (type === "category") {
-            const categoryA = movieA.categories.length > 0 ? movieA.categories.reduce((actual, categoryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObA.name}`, "") : "SEM CATEGORIA"
-            const categoryB = movieB.categories.length > 0 ? movieB.categories.reduce((actual, categoryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${categoryObB.name}`, "") : "SEM CATEGORIA"
-            if (categoryA.toLowerCase() > categoryB.toLowerCase()) {
-                return 1
-            }
-            if (categoryA.toLowerCase() < categoryB.toLowerCase()) {
-                return -1
-            }
         } else if (type === "releaseUp" || type === "releaseDown") {
             const statusOrder = type === "releaseUp"
             let yearA = movieA.release.length === 4 ? parseInt(movieA.release, 10) : 0
@@ -166,15 +158,6 @@ function orderMovies(movies, type: string) {
             if (hourA === hourB) {
                 if (minuteA > minuteB) return statusOrder ? 1 : -1
                 if (minuteA < minuteB) return statusOrder ? -1 : 1
-            }
-        } else if (type === "country") {
-            const countryA = movieA.countries.length > 0 ? movieA.countries.reduce((actual, countryObA) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObA.name}`, "") : "SEM PAÍS DE ORIGEM"
-            const countryB = movieB.countries.length > 0 ? movieB.countries.reduce((actual, countryObB) => `${actual.length > 0 ? `${actual}, ` : ""}${countryObB.name}`, "") : "SEM PAÍS DE ORIGEM"
-            if (countryA.toLowerCase() > countryB.toLowerCase()) {
-                return 1
-            }
-            if (countryA.toLowerCase() < countryB.toLowerCase()) {
-                return -1
             }
         }
         return 0
@@ -241,6 +224,39 @@ export const getMovieAllByNotMyMovie = (callbackSuccess: () => void, callbackErr
             let moviesFilterValue = searchMovies(moviesValue, searchTextValue)
             moviesFilterValue = orderMovies(moviesFilterValue, "title")
             dispatch({ type: MOVIE_LIST_REDUCER, movies: moviesValue, moviesFilter: moviesFilterValue })
+            callbackSuccess()
+        } else {
+            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+        }
+    }).catch(() => {
+        window.location.href = "/failpage/error_api"
+    })
+}
+
+export const getDetailsMovieAll = (moviesGeneral, moviesPagination, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const idsMovie: any[] = []
+    for (let mg = 0; mg < moviesGeneral.length; mg++) {
+        let statusDetails = false
+        for (let m = 0; m < moviesPagination.length; m++) {
+            if (moviesPagination[m]._id === moviesGeneral[mg]._id) {
+                statusDetails = true
+            }
+        }
+        if (statusDetails) {
+            idsMovie.push(moviesGeneral[mg]._id)
+        }
+    }
+    await api.post("movie/open/details/all", { movieIds: idsMovie, object: { category: true, country: true } }).then(response => {
+        if (response.data.status) {
+            const moviesData = response.data.datas
+            const moviesNew = moviesGeneral.map(m => {
+                const moviesDataFilter = moviesData.filter(md => md._id === m._id)
+                if (moviesDataFilter.length > 0)
+                    return moviesDataFilter[0]
+                return m
+            })
+            dispatch({ type: MOVIE_LIST_FILTER_REDUCER, movies: moviesNew })
             callbackSuccess()
         } else {
             callbackError(response.data.errors.map(erro => `${erro.msg}`))

@@ -14,7 +14,7 @@ export default class FormControlField extends React.Component<{
         return (
             <FormControl fullWidth>
                 <TextField type={typeField} multiline={isMultiline} size={sizeValue} variant={variantValue} disabled={isDisabled} label={labelValue}
-                    value={valueDefault} onChange={onChangeForm} maxRows={totalRows} {...other} />
+                    value={!isDisabled ? valueDefault : ""} onChange={onChangeForm} maxRows={totalRows} {...other} />
             </FormControl>
         )
     }

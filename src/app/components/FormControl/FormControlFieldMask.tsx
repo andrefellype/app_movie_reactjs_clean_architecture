@@ -15,7 +15,7 @@ export default class FormControlFieldMask extends React.Component<{
 
         return (
             <FormControl fullWidth>
-                <InputMask type={typeField} mask={valueMask} value={valueDefault} disabled={isDisabled} onChange={onChangeForm} maxRows={totalRows} multiline={isMultiline}>
+                <InputMask type={typeField} mask={valueMask} value={!isDisabled ? valueDefault : ""} disabled={isDisabled} onChange={onChangeForm} maxRows={totalRows} multiline={isMultiline}>
                     {() => <TextField size={sizeValue} variant={variantValue} label={labelValue} {...other} />}
                 </InputMask>
             </FormControl>

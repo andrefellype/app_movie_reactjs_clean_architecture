@@ -48,8 +48,8 @@ export const approvedReviewedCountryById = (countryIdValue: string, callbackSucc
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateCountryById = (countryIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { countryId: countryIdValue, name: nameValue }
+export const updateCountryById = (countryIdValue: string, initialValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+    const objectData = { countryId: countryIdValue, initial: initialValue }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("country/update", objectData).then(response => {
@@ -80,8 +80,8 @@ export const openCountryById = (countryIdValue: string, callbackSuccess: () => v
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerCountry = (nameValue: string, reviewedStatus: number, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { name: nameValue, reviewed: reviewedStatus }
+export const registerCountry = (initialValue: string, reviewedStatus: number, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+    const objectData = { initial: initialValue, reviewed: reviewedStatus }
     const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
     api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
     await api.post("country/register", objectData).then(response => {
@@ -97,10 +97,10 @@ export const registerCountry = (nameValue: string, reviewedStatus: number, callb
 
 function orderCountriesByName(countries) {
     return countries.sort((countryA, countryB) => {
-        if (countryA.name.toLowerCase() > countryB.name.toLowerCase()) {
+        if (countryA.initial.toLowerCase() > countryB.initial.toLowerCase()) {
             return 1
         }
-        if (countryA.name.toLowerCase() < countryB.name.toLowerCase()) {
+        if (countryA.initial.toLowerCase() < countryB.initial.toLowerCase()) {
             return -1
         }
         return 0
@@ -108,7 +108,7 @@ function orderCountriesByName(countries) {
 }
 
 function searchCountries(countries, search: string) {
-    return countries.filter(country => country.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
+    return countries.filter(country => country.initial.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 
 export const getCountryAllBySearch = (searchValue: string, countriesGeneral: []) => async dispatch => {

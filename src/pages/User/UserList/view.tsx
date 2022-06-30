@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
-import {
-    Card, CardActions, Grid, TableContainer, Paper, Table, TableHead, TableRow,
-    TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Radio, RadioGroup, FormControlLabel,
-    FormControl, Checkbox
-} from "@mui/material"
+import { Card, CardActions, Grid, TableContainer, Paper, Table, TableRow, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Radio, RadioGroup, FormControlLabel, FormControl } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 
-import FormControlField from "../../../app/components/FormControl/FormControlField"
+import FormControlField from '../../../app/components/FormControl/FormControlField'
 import ButtonBlueGray from '../../../app/components/Button/ButtonBlueGray'
 import ButtonIndigo from '../../../app/components/Button/ButtonIndigo'
 import ButtonSuccess from '../../../app/components/Button/ButtonSuccess'
@@ -24,8 +20,10 @@ import TableRowStyle from '../../../app/components/Table/TableRowStyle'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
 import FormControlFieldSelect from '../../../app/components/FormControl/FormControlFieldSelect'
-import { MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, MSG_EMPTY_LIST, MSG_UPDATE_STATUS_REGISTER_QUESTION, URL_USERS, URL_USER_NEW } from '../../../app/core/consts'
+import { MSG_DELETE_REGISTER_QUESTION, MSG_UPDATE_STATUS_REGISTER_QUESTION, URL_USERS, URL_USERS_TRASH, URL_USER_NEW } from '../../../app/core/consts'
 import PaginationList from '../../../app/components/PaginationList'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -34,36 +32,16 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-function reducerArrayDeleteBatch(state, action) {
-    switch (action.type) {
-        case 'add':
-            const deletesAdd = state.arrayDeleteBatch
-            deletesAdd.push(action._id)
-            return { arrayDeleteBatch: deletesAdd }
-        case 'remove':
-            let deletesRemove = state.arrayDeleteBatch
-            deletesRemove = deletesRemove.filter((value) => value !== action._id)
-            return { arrayDeleteBatch: deletesRemove }
-        case 'erase':
-            return { arrayDeleteBatch: [] }
-        default:
-            throw new Error()
-    }
-}
-
 const UserListView: React.FC<{
-    users: any, usersBatch: any, countUser: number, positionPage: number, changePagination: any, orderDefault: string, actionChangeSearchText: any, actionClickFilter: any, actionEraseFilter: any, actionOrderList: any, actionRefreshList: any, showUpdatePassword: any,
-    actionUpdateEnabled: any, actionDeleteRegister: any, actionDeleteBatch: any
-}> = function ({ users, usersBatch, countUser, positionPage, changePagination, orderDefault, actionChangeSearchText, actionClickFilter, actionEraseFilter, actionOrderList, actionRefreshList, showUpdatePassword,
-    actionUpdateEnabled, actionDeleteRegister, actionDeleteBatch }) {
+    users: any, countUser: number, positionPage: number, changePagination: any, orderDefault: string, actionChangeSearchText: any, actionClickFilter: any, actionEraseFilter: any, actionOrderList: any, actionRefreshList: any, showUpdatePassword: any,
+    actionUpdateEnabled: any, actionDeleteRegister: any, showLoading: any | null
+}> = function ({ users, countUser, positionPage, changePagination, orderDefault, actionChangeSearchText, actionClickFilter, actionEraseFilter, actionOrderList, actionRefreshList, showUpdatePassword,
+    actionUpdateEnabled, actionDeleteRegister, showLoading }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
 
         const [idDelete, setIdDelete] = React.useState(-1)
-        const [isDeleteBatch, setIsDeleteBatch] = React.useState(false)
-        const [isDeleteBatchShow, setIsDeleteBatchShow] = React.useState(false)
-        const [stateArrayDeleteBatch, dispatchArrayDeleteBatch] = React.useReducer(reducerArrayDeleteBatch, { arrayDeleteBatch: [] })
         const [idEnabled, setIdEnabled] = React.useState(-1)
         const [searchText, setSearchText] = React.useState("")
         const [isFilter, setIsFilter] = React.useState(false)
@@ -114,24 +92,10 @@ const UserListView: React.FC<{
             actionUpdateEnabled(userId, orderField, searchText, levelFilter)
         }
 
-        function changeDeleteBatch(checked, idUser) {
-            if (checked) {
-                dispatchArrayDeleteBatch({ type: 'add', _id: idUser })
-            } else {
-                dispatchArrayDeleteBatch({ type: 'remove', _id: idUser })
-            }
-        }
-
         async function deleteRegister() {
             const userId = idDelete
             setIdDelete(-1)
             actionDeleteRegister(userId, orderField, searchText, levelFilter)
-        }
-
-        async function deleteBatch() {
-            setIsDeleteBatchShow(false)
-            setIsDeleteBatch(false)
-            actionDeleteBatch(stateArrayDeleteBatch.arrayDeleteBatch, orderField, searchText, levelFilter, () => dispatchArrayDeleteBatch({ type: 'erase' }))
         }
 
         function filterListUsers() {
@@ -150,7 +114,7 @@ const UserListView: React.FC<{
                         </InputAdornment>
                     }} />
                     <ButtonSuccess style={{ marginLeft: 10 }} titleIcon={ICON_OBJECT_LIST.ADD_ICON} iconTitleSize="medium" actionClick={() => navigate(URL_USER_NEW)} />
-                    <ButtonDanger isDisabled={(!usersBatch || usersBatch.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
+                    <ButtonDanger titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => navigate(URL_USERS_TRASH)} />
                 </CardActions>
                 {levelNameFilter.length > 0 && <CardActions className={classes.flex_center}>
                     <Grid container spacing={2}>
@@ -193,7 +157,7 @@ const UserListView: React.FC<{
             return <CardActions className={classes.flex_center}>
                 <TableContainer component={Paper}>
                     <Table aria-label="customized table">
-                        <TableHead>
+                        <TableHeadStyle>
                             <TableRow>
                                 <TableCellStyle>Nome</TableCellStyle>
                                 <TableCellStyle width={125}>Nascimento</TableCellStyle>
@@ -203,45 +167,39 @@ const UserListView: React.FC<{
                                 <TableCellStyle width={150}>Acesso</TableCellStyle>
                                 <TableCellStyle width={180} />
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(!users || users.length === 0) ?
-                                <TableRowStyle hover>
-                                    <TableCellStyle colSpan={7} scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                        {MSG_EMPTY_LIST.toUpperCase()}
+                        </TableHeadStyle>
+                        <TableBodyStyle colSpanValue={7} listData={users} isLoading={showLoading}>
+                            {users && users.map((row, key) => (
+                                <TableRowStyle hover key={key}>
+                                    <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
+                                        {row.name}
                                     </TableCellStyle>
-                                </TableRowStyle> :
-                                users.map((row, key) => (
-                                    <TableRowStyle hover key={key}>
-                                        <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                            {row.name}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {formatDateStr(row.birth)}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {row.cellphone !== null ? formatCellphone(row.cellphone) : "SEM NÚMERO"}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="left">
-                                            {getLevelStr(row.level)}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="center">
-                                            {formatDatetimeStr(row.created_at)}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="center">
-                                            {row.last_access_at !== null ? formatDatetimeStr(row.last_access_at) : "NÃO ACESSOU"}
-                                        </TableCellStyle>
-                                        <TableCellStyle align="center">
-                                            <ButtonGroup variant="contained" aria-label="outlined primary button group">
-                                                <ButtonIndigo sizeBtn='small' actionClick={() => navigate(`${URL_USERS}/${row._id}`)} titleIcon={ICON_OBJECT_LIST.REMOVE_RED_EYE_ICON} />
-                                                <ButtonBlueGray actionClick={() => showUpdatePassword(row)} titleIcon={ICON_OBJECT_LIST.VPN_KEY_ICON} />
-                                                {!row.enabled ? <ButtonPink actionClick={() => setIdEnabled(row._id)} titleIcon={ICON_OBJECT_LIST.LOCK_ICON} /> : <ButtonSuccess actionClick={() => setIdEnabled(row._id)} titleIcon={ICON_OBJECT_LIST.LOCK_OPEN_ICON} />}
-                                                <ButtonDanger actionClick={() => setIdDelete(row._id)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} />
-                                            </ButtonGroup>
-                                        </TableCellStyle>
-                                    </TableRowStyle>
-                                ))}
-                        </TableBody>
+                                    <TableCellStyle align="left">
+                                        {formatDateStr(row.birth)}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {row.cellphone !== null ? formatCellphone(row.cellphone) : "SEM NÚMERO"}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="left">
+                                        {getLevelStr(row.level)}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="center">
+                                        {formatDatetimeStr(row.created_at)}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="center">
+                                        {row.last_access_at !== null ? formatDatetimeStr(row.last_access_at) : "NÃO ACESSOU"}
+                                    </TableCellStyle>
+                                    <TableCellStyle align="center">
+                                        <ButtonGroup variant="contained" aria-label="outlined primary button group">
+                                            <ButtonIndigo sizeBtn='small' actionClick={() => navigate(`${URL_USERS}/${row._id}`)} titleIcon={ICON_OBJECT_LIST.REMOVE_RED_EYE_ICON} />
+                                            <ButtonBlueGray actionClick={() => showUpdatePassword(row)} titleIcon={ICON_OBJECT_LIST.VPN_KEY_ICON} />
+                                            {!row.enabled ? <ButtonPink actionClick={() => setIdEnabled(row._id)} titleIcon={ICON_OBJECT_LIST.LOCK_ICON} /> : <ButtonSuccess actionClick={() => setIdEnabled(row._id)} titleIcon={ICON_OBJECT_LIST.LOCK_OPEN_ICON} />}
+                                            <ButtonDanger actionClick={() => setIdDelete(row._id)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} />
+                                        </ButtonGroup>
+                                    </TableCellStyle>
+                                </TableRowStyle>
+                            ))}
+                        </TableBodyStyle>
                     </Table>
                 </TableContainer>
             </CardActions>
@@ -285,42 +243,6 @@ const UserListView: React.FC<{
             </Dialog>)
         }
 
-        function dialogDeleteBatch() {
-            return (<Dialog fullWidth maxWidth="md" open={isDeleteBatch} onClose={() => setIsDeleteBatch(true)} aria-labelledby="form-dialog-title">
-                <DialogContent>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <TableContainer component={Paper}>
-                                <Table aria-label="customized table">
-                                    <TableBody>
-                                        {usersBatch && usersBatch.map((row, key) => (
-                                            <TableRowStyle hover key={key}
-                                                onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
-                                                <TableCellStyle width={25} align="center">
-                                                    <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
-                                                        onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
-                                                </TableCellStyle>
-                                                <TableCellStyle scope="row" align="left">
-                                                    {row.name}
-                                                </TableCellStyle>
-                                                <TableCellStyle width={100}>
-                                                    {getLevelStr(row.level)}
-                                                </TableCellStyle>
-                                            </TableRowStyle>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions>
-                    <ButtonSuccess title="APAGAR" actionClick={() => setIsDeleteBatchShow(true)} />
-                    <ButtonDanger title="FECHAR" actionClick={() => setIsDeleteBatch(false)} />
-                </DialogActions>
-            </Dialog>)
-        }
-
         return (
             <PageCard title="LISTA DE USUÁRIOS">
                 <Grid container spacing={2}>
@@ -328,20 +250,17 @@ const UserListView: React.FC<{
                         <Card>
                             {filterListUsers()}
                             {getListUsers()}
-                            <PaginationList valuePage={positionPage} dataList={users} countList={countUser} style={{ margin: 5 }}
+                            <PaginationList isLoading={showLoading} valuePage={positionPage} dataList={users} countList={countUser} style={{ margin: 5 }}
                                 actionClick={(value: number) => changePagination(value)} />
                         </Card>
                     </Grid>
                 </Grid>
                 <DialogYesOrNot showDialog={idDelete !== -1} onCloseDialog={() => setIdDelete(-1)} clickDialogNot={() => setIdDelete(-1)}
                     titleDialog={MSG_DELETE_REGISTER_QUESTION} clickDialogYes={() => deleteRegister()} />
-                <DialogYesOrNot showDialog={isDeleteBatchShow} onCloseDialog={() => setIsDeleteBatchShow(false)} clickDialogNot={() => setIsDeleteBatchShow(false)}
-                    titleDialog={MSG_DELETE_REGISTERS_QUESTION} clickDialogYes={() => deleteBatch()} />
                 <DialogYesOrNot showDialog={idEnabled !== -1} onCloseDialog={() => setIdEnabled(-1)} clickDialogNot={() => setIdEnabled(-1)}
                     titleDialog={MSG_UPDATE_STATUS_REGISTER_QUESTION} clickDialogYes={() => updateEnabled()} />
                 {dialogFilter()}
                 {dialogOrder()}
-                {dialogDeleteBatch()}
             </PageCard >
         )
     }

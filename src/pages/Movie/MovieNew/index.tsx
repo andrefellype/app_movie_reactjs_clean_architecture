@@ -10,9 +10,8 @@ import { getCountryAll } from '../../../app/redux/Country/country.actions'
 import { getCountriesAll, getCountriesAllFilter, getCountrySingle } from '../../../app/redux/Country/country.selector'
 import { getDirectorAll } from '../../../app/redux/Director/director.actions'
 import { getDirectorsAll, getDirectorsAllFilter, getDirectorSingle } from '../../../app/redux/Director/director.selector'
-import { showLoading } from '../../../app/redux/LoadingMain/loadingMain.actions'
+import { showLoadingPattern, insertMsgs } from '../../../app/redux/UtlisAppRedux/utlisAppRedux.actions'
 import { registerMovie } from '../../../app/redux/Movie/movie.actions'
-import { insertMsgs } from '../../../app/redux/MsgAlert/msgAlert.actions'
 import { getStreamAll } from '../../../app/redux/Stream/stream.actions'
 import { getStreamsAll, getStreamsAllFilter, getStreamSingle } from '../../../app/redux/Stream/stream.selector'
 import { MovieNewCastInsertActor, MovieNewCastBySearch, MovieNewDirectorBySearch, MovieNewDirectorOpenById, MovieNewCastUpdateActor, MovieNewCastDeleteActor, MovieNewDirectorDelete, MovieNewDirectorUpdate, MovieNewDirectorInsert, MovieNewActorOpenById, MovieNewCategoryBySearch, MovieNewCountryBySearch, MovieNewCountryInsert, MovieNewCountryUpdate, MovieNewCountryDelete, MovieNewCountryOpenById, MovieNewStreamDelete, MovieNewStreamInsert, MovieNewStreamUpdate, MovieNewStreamBySearch, MovieNewStreamOpenById } from './actions'
@@ -42,85 +41,85 @@ function MovieNew() {
     const stream = useSelector(getStreamSingle)
 
     React.useEffect(() => {
-        dispatch(showLoading(true))
+        dispatch(showLoadingPattern(true))
         dispatch(getActorAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, ""))
         dispatch(getDirectorAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, ""))
         dispatch(getCategoryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, ""))
         dispatch(getCountryAll(null, (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, ""))
-        dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, ""))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     async function refreshListDirector(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getDirectorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getDirectorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListCast(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getActorAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getActorAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListCategory(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getCategoryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getCategoryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, searchText))
         callbackSucess()
     }
 
     async function refreshListCountry(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getCountryAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getCountryAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function refreshListStream(searchText: string, callbackSucess: () => void) {
-        await dispatch(showLoading(true))
-        await dispatch(getStreamAll(() => dispatch(showLoading(false)), (errorsMsg) => {
+        await dispatch(showLoadingPattern(true))
+        await dispatch(getStreamAll(() => dispatch(showLoadingPattern(false)), (errorsMsg) => {
             dispatch(insertMsgs(errorsMsg, 'error'))
-            dispatch(showLoading(false))
+            dispatch(showLoadingPattern(false))
         }, 0, searchText))
         callbackSucess()
     }
 
     async function insertMovie(titleValue: string, releaseValue: string, directorsValue: [], castsValue: [], durationValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], movieTheaterValue: string, resumeValue: string) {
-        await dispatch(showLoading(true, MSG_SAVED_DATA))
+        await dispatch(showLoadingPattern(true, MSG_SAVED_DATA))
         await dispatch(registerMovie(
             titleValue, releaseValue, directorsValue, castsValue, durationValue,
             categoriesValue, countriesValue, streamsValue, movieTheaterValue, resumeValue, () => {
                 dispatch(insertMsgs([MSG_NEW_REGISTER_SUCCESS], "success", null, "reload_page"))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }, (errorsMsg) => {
                 dispatch(insertMsgs(errorsMsg, 'error'))
-                dispatch(showLoading(false))
+                dispatch(showLoadingPattern(false))
             }))
     }
 
@@ -130,16 +129,16 @@ function MovieNew() {
             openStream={(idStream: string) => dispatch(MovieNewStreamOpenById(idStream))}
             actionChangeSearchStream={(searchText: string) => dispatch(MovieNewStreamBySearch(searchText, streamsGeneral))}
             actionRefreshListStream={(searchText: string, callbackSucess: () => void) => refreshListStream(searchText, callbackSucess)}
-            actionInsertRegisterStream={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewStreamInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterStream={(idStream: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewStreamUpdate(idStream, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterStream={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewStreamInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterStream={(idStream: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewStreamUpdate(idStream, nameValue, callbackSuccess, calllbackError))}
             actionDeleteRegisterStream={(streamId: string, searchText: string, successDestroy: () => void) => dispatch(MovieNewStreamDelete(streamId, searchText, successDestroy))}
 
             countries={countries} country={country}
             openCountry={(idCountry: string) => dispatch(MovieNewCountryOpenById(idCountry))}
             actionChangeSearchCountry={(searchText: string) => dispatch(MovieNewCountryBySearch(searchText, countriesGeneral))}
             actionRefreshListCountry={(searchText: string, callbackSucess: () => void) => refreshListCountry(searchText, callbackSucess)}
-            actionInsertRegisterCountry={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCountryInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterCountry={(idCountry: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCountryUpdate(idCountry, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterCountry={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCountryInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterCountry={(idCountry: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCountryUpdate(idCountry, nameValue, callbackSuccess, calllbackError))}
             actionDeleteRegisterCountry={(countryId: string, searchText: string, successDestroy: () => void) => dispatch(MovieNewCountryDelete(countryId, searchText, successDestroy))}
 
             categories={categories} actionChangeSearchCategory={(searchText: string) => dispatch(MovieNewCategoryBySearch(searchText, categoriesGeneral))}
@@ -148,14 +147,14 @@ function MovieNew() {
             actors={actors} actor={actor}
             openActor={(idActor: string) => dispatch(MovieNewActorOpenById(idActor))}
             actionChangeSearchCast={(searchText: string) => dispatch(MovieNewCastBySearch(searchText, actorsGeneral))}
-            actionInsertRegisterActor={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCastInsertActor(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterActor={(idActor: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCastUpdateActor(idActor, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterActor={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCastInsertActor(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterActor={(idActor: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewCastUpdateActor(idActor, nameValue, callbackSuccess, calllbackError))}
             actionRefreshListCast={(searchText: string, callbackSucess: () => void) => refreshListCast(searchText, callbackSucess)}
             actionDeleteRegisterActor={(actorId: string, searchText: string, successDestroy: () => void) => dispatch(MovieNewCastDeleteActor(actorId, searchText, successDestroy))}
 
             directors={directors} director={director}
-            actionInsertRegisterDirector={(nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewDirectorInsert(nameValue, searchText, callbackSuccess, calllbackError))}
-            actionUpdateRegisterDirector={(idDirector: string, nameValue: string, searchText: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewDirectorUpdate(idDirector, nameValue, searchText, callbackSuccess, calllbackError))}
+            actionInsertRegisterDirector={(nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewDirectorInsert(nameValue, callbackSuccess, calllbackError))}
+            actionUpdateRegisterDirector={(idDirector: string, nameValue: string, callbackSuccess: () => void, calllbackError: () => void) => dispatch(MovieNewDirectorUpdate(idDirector, nameValue, callbackSuccess, calllbackError))}
             openDirector={(idDirector: string) => dispatch(MovieNewDirectorOpenById(idDirector))}
             actionRefreshListDirector={(searchText: string, callbackSucess: () => void) => refreshListDirector(searchText, callbackSucess)}
             actionChangeSearchDirector={(searchText: string) => dispatch(MovieNewDirectorBySearch(searchText, directorsGeneral))}

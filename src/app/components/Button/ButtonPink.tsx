@@ -16,7 +16,7 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
 }))
 
 export default class ButtonPink extends React.Component<{
-    title?: string, iconStart?: string, iconStartSize?: 'inherit' | 'large' | 'medium' | 'small', titleIcon?: string, iconTitleSize?: 'inherit' | 'large' | 'medium' | 'small', isFullWidth?: boolean, isDisabled?: boolean, valueVariant?: 'text' | 'outlined' | 'contained', sizeBtn?: 'small' | 'medium' | 'large', actionClick?: () => void | null, style?: object
+    title?: string, iconStart?: string, iconStartSize?: 'inherit' | 'large' | 'medium' | 'small', titleIcon?: string, iconTitleSize?: 'inherit' | 'large' | 'medium' | 'small', isFullWidth?: boolean, isDisabled?: boolean, valueVariant?: 'text' | 'outlined' | 'contained', sizeBtn?: 'small' | 'medium' | 'large', actionClick?: (() => void) | null, style?: object
 }> {
 
     render() {

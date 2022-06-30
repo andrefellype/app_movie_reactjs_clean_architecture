@@ -22,7 +22,7 @@ const useStyles = makeStyles(() => ({
     }
 }))
 
-const UpdateUserPasswordView: React.FC<{ getUser: any, update: any }> = function ({ getUser, update }) {
+const UpdateUserPasswordView: React.FC<{ getUser: any, isLoading: boolean, update: any }> = function ({ getUser, isLoading, update }) {
 
     const classes = useStyles()
     const navigate = useNavigate()
@@ -40,32 +40,32 @@ const UpdateUserPasswordView: React.FC<{ getUser: any, update: any }> = function
                         <CardActions>
                             <Grid container spacing={2}>
                                 <Grid item md={6} xs={12}>
-                                    <FormControlField isDisabled={!getUser} labelValue="NOME" valueDefault={getUser ? getUser.name : ""} />
+                                    <FormControlField labelValue="NOME" valueDefault={(getUser && !isLoading) ? getUser.name : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={3} xs={12}>
-                                    <FormControlFieldMask isDisabled={!getUser} valueMask="99/99/9999" labelValue={(getUser && getUser.birth) ? "NASCIMENTO" : ""} valueDefault={(getUser && getUser.birth) ? ConvertDate(getUser.birth, "stringEUAToStringBR") : ""} />
+                                    <FormControlFieldMask valueMask="99/99/9999" labelValue={(getUser && !isLoading && getUser.birth) ? "NASCIMENTO" : ""} valueDefault={(getUser && getUser.birth) ? ConvertDate(getUser.birth, "stringEUAToStringBR") : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={3} xs={12}>
-                                    <FormControlFieldMask isDisabled={!getUser} valueMask="(99) 99999-9999" labelValue={(getUser && getUser.cellphone) ? "CELULAR" : ""} valueDefault={(getUser && getUser.cellphone) ? getUser.cellphone : ""} />
+                                    <FormControlFieldMask valueMask="(99) 99999-9999" labelValue={(getUser && !isLoading && getUser.cellphone) ? "CELULAR" : ""} valueDefault={(getUser && getUser.cellphone) ? getUser.cellphone : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item md={6} xs={12}>
-                                    <FormControlField isDisabled={!getUser} labelValue={(getUser && getUser.email) ? "EMAIL" : ""} valueDefault={(getUser && getUser.email) ? getUser.email : ""} />
+                                    <FormControlField labelValue={(getUser && getUser.email) ? "EMAIL" : ""} valueDefault={(getUser && !isLoading && getUser.email) ? getUser.email : ""} InputProps={{ readOnly: true }} />
                                 </Grid>
                                 <Grid item sm={3} xs={12}>
-                                    <FormControlField isDisabled={!getUser} typeField={viewPassword ? "text" : "password"} labelValue="SENHA*" valueDefault={passwordField} InputProps={{
+                                    <FormControlField isDisabled={(!getUser || isLoading)} typeField={viewPassword ? "text" : "password"} labelValue="SENHA*" valueDefault={passwordField} InputProps={{
                                         endAdornment:
                                             <InputAdornment position="end">
-                                                <IconButton disabled={!getUser} onClick={() => setViewPassword(!viewPassword)} edge="end">
+                                                <IconButton disabled={(!getUser || isLoading)} onClick={() => setViewPassword(!viewPassword)} edge="end">
                                                     <IconList icon={viewPassword ? ICON_OBJECT_LIST.VISIBILITY_ICON : ICON_OBJECT_LIST.VISIBILITY_OFF_ICON} />
                                                 </IconButton>
                                             </InputAdornment>
                                     }} onChangeForm={(e) => setPasswordField(e.target.value)} />
                                 </Grid>
                                 <Grid item sm={3} xs={12}>
-                                    <FormControlField isDisabled={!getUser} typeField={confirmViewPassword ? "text" : "password"} labelValue="CONFIRMAÇÃO*" valueDefault={confirmPasswordField} InputProps={{
+                                    <FormControlField isDisabled={(!getUser || isLoading)} typeField={confirmViewPassword ? "text" : "password"} labelValue="CONFIRMAÇÃO*" valueDefault={confirmPasswordField} InputProps={{
                                         endAdornment:
                                             <InputAdornment position="end">
-                                                <IconButton disabled={!getUser} onClick={() => setConfirmViewPassword(!confirmViewPassword)} edge="end">
+                                                <IconButton disabled={(!getUser || isLoading)} onClick={() => setConfirmViewPassword(!confirmViewPassword)} edge="end">
                                                     <IconList icon={confirmViewPassword ? ICON_OBJECT_LIST.VISIBILITY_ICON : ICON_OBJECT_LIST.VISIBILITY_OFF_ICON} />
                                                 </IconButton>
                                             </InputAdornment>
@@ -74,7 +74,7 @@ const UpdateUserPasswordView: React.FC<{ getUser: any, update: any }> = function
                             </Grid>
                         </CardActions>
                         <CardActions className={classes.button_end}>
-                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={!getUser} actionClick={() => update(passwordField, confirmPasswordField)} />
+                            <ButtonSuccess title="SALVAR" iconStart={ICON_OBJECT_LIST.CHECK_ICON} isDisabled={(!getUser || isLoading)} actionClick={() => update(passwordField, confirmPasswordField)} />
                             <ButtonIndigo title="VOLTAR" iconStart={ICON_OBJECT_LIST.ARROW_BACK_IOS_NEW_ICON} actionClick={() => navigate(URL_USERS)} />
                         </CardActions>
                     </Card>

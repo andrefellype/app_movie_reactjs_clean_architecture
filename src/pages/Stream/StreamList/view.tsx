@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-underscore-dangle */
 import React from 'react'
-import { Card, CardActions, Grid, TableContainer, Paper, Table, TableHead, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox } from "@mui/material"
+import { Card, CardActions, Grid, TableContainer, Paper, Table, TableRow, TableBody, ButtonGroup, InputAdornment, IconButton, Dialog, DialogContent, DialogActions, Checkbox } from "@mui/material"
 import { makeStyles } from "@material-ui/styles"
 import { useNavigate } from 'react-router-dom'
 import FormControlField from "../../../app/components/FormControl/FormControlField"
@@ -14,8 +14,10 @@ import TableCellStyle from '../../../app/components/Table/TableCellStyle'
 import TableRowStyle from '../../../app/components/Table/TableRowStyle'
 import PageCard from '../../../app/components/PageCard'
 import ICON_OBJECT_LIST from '../../../app/components/IconList/ICON_OBJECT_LIST'
-import { MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, MSG_EMPTY_LIST, URL_STREAM_EDIT, URL_STREAM_NEW } from '../../../app/core/consts'
-import PaginationList from '../../../app/components/PaginationList'
+import { MSG_APPROVED_REVIEWED_REGISTER_QUESTION, MSG_DELETE_REGISTERS_QUESTION, MSG_DELETE_REGISTER_QUESTION, URL_STREAM_EDIT, URL_STREAM_NEW } from '../../../app/core/consts'
+import ScrollInfiniteList from '../../../app/components/ScrollInfiniteList'
+import TableBodyStyle from '../../../app/components/Table/TableBodyStyle'
+import TableHeadStyle from '../../../app/components/Table/TableHeadStyle'
 
 const useStyles = makeStyles(() => ({
     flex_center: {
@@ -41,12 +43,18 @@ function reducerArrayDeleteBatch(state, action) {
     }
 }
 
-const StreamListView: React.FC<{ streams: any, streamsBatch: any, positionPage: number, countStream: number, changePagination: any, actionChangeSearchText: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any }> =
-    function ({ streams, streamsBatch, positionPage, countStream, changePagination, actionChangeSearchText, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister }) {
+const StreamListView: React.FC<{ streams: any, showLoading: boolean, actionChangeSearchText: any, actionRefreshList: any, actionDeleteRegister: any, actionDeleteBatch: any, actionApprovedRegister: any, getListScroll: (valueScroll: number) => any[] }> =
+    function ({ streams, actionChangeSearchText, actionRefreshList, actionDeleteRegister, actionDeleteBatch, actionApprovedRegister, showLoading, getListScroll }) {
 
         const classes = useStyles()
         const navigate = useNavigate()
 
+        const valueInitialScroll = 30
+        const valueInitialScrollBatch = 15
+
+        const [positionScroll, setPositionScroll] = React.useState(0)
+        const [positionScrollBatch, setPositionScrollBatch] = React.useState(0)
+        const [listScroll, setListScroll] = React.useState<any[]>([])
         const [idDelete, setIdDelete] = React.useState(-1)
         const [isDeleteBatch, setIsDeleteBatch] = React.useState(false)
         const [idReviewed, setIdReviewed] = React.useState("")
@@ -54,9 +62,18 @@ const StreamListView: React.FC<{ streams: any, streamsBatch: any, positionPage: 
         const [stateArrayDeleteBatch, dispatchArrayDeleteBatch] = React.useReducer(reducerArrayDeleteBatch, { arrayDeleteBatch: [] })
         const [searchText, setSearchText] = React.useState("")
 
+        React.useEffect(() => {
+            if (streams) {
+                setListScroll(getListScroll((positionScroll * valueInitialScroll)))
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [positionScroll, streams])
+
         function changeSearchText(search: string) {
             setSearchText(search)
-            actionChangeSearchText(search)
+            actionChangeSearchText(search, () => {
+                setPositionScroll(1)
+            })
         }
 
         async function refreshList() {
@@ -100,27 +117,24 @@ const StreamListView: React.FC<{ streams: any, streamsBatch: any, positionPage: 
                     </InputAdornment>
                 }} />
                 <ButtonSuccess style={{ marginLeft: 10 }} titleIcon={ICON_OBJECT_LIST.ADD_ICON} iconTitleSize="medium" actionClick={() => navigate(URL_STREAM_NEW)} />
-                <ButtonDanger isDisabled={(!streamsBatch || streamsBatch.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
+                <ButtonDanger isDisabled={(!streams || streams.length === 0)} titleIcon={ICON_OBJECT_LIST.DELETE_ICON} iconTitleSize="medium" actionClick={() => setIsDeleteBatch(true)} />
             </CardActions>)
         }
 
         function getListStreams() {
-            return <CardActions className={classes.flex_center}>
-                <TableContainer component={Paper}>
-                    <Table aria-label="customized table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCellStyle>Nome</TableCellStyle>
-                                <TableCellStyle width={100} />
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {(!streams || streams.length === 0) ? <TableRowStyle hover>
-                                <TableCellStyle colSpan={2} scope="row" align="left" style={{ fontWeight: 'bold' }}>
-                                    {MSG_EMPTY_LIST.toUpperCase()}
-                                </TableCellStyle>
-                            </TableRowStyle> :
-                                streams.map((row, key) => (
+            return <ScrollInfiniteList isShowScroll={(!streams || (positionScroll * valueInitialScroll) < streams.length)}
+                updateScroll={() => setPositionScroll((positionScroll + 1))}>
+                <CardActions className={classes.flex_center}>
+                    <TableContainer component={Paper}>
+                        <Table aria-label="customized table">
+                            <TableHeadStyle>
+                                <TableRow>
+                                    <TableCellStyle>Nome</TableCellStyle>
+                                    <TableCellStyle width={100} />
+                                </TableRow>
+                            </TableHeadStyle>
+                            <TableBodyStyle isLoading={showLoading} colSpanValue={2} listData={streams}>
+                                {listScroll.map((row, key) => (
                                     <TableRowStyle hover key={key}>
                                         <TableCellStyle scope="row" align="left" style={{ fontWeight: 'bold' }}>
                                             {row.name}
@@ -134,10 +148,11 @@ const StreamListView: React.FC<{ streams: any, streamsBatch: any, positionPage: 
                                         </TableCellStyle>
                                     </TableRowStyle>
                                 ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </CardActions>
+                            </TableBodyStyle>
+                        </Table>
+                    </TableContainer>
+                </CardActions>
+            </ScrollInfiniteList>
         }
 
         function dialogDeleteBatch() {
@@ -145,24 +160,27 @@ const StreamListView: React.FC<{ streams: any, streamsBatch: any, positionPage: 
                 <DialogContent>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <TableContainer component={Paper}>
-                                <Table aria-label="customized table">
-                                    <TableBody>
-                                        {streamsBatch && streamsBatch.map((row, key) => (
-                                            <TableRowStyle hover key={key}
-                                                onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
-                                                <TableCellStyle width={25} align="center">
-                                                    <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
-                                                        onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
-                                                </TableCellStyle>
-                                                <TableCellStyle scope="row" align="left">
-                                                    {row.name}
-                                                </TableCellStyle>
-                                            </TableRowStyle>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
+                            <ScrollInfiniteList isShowScroll={(!streams || (positionScrollBatch * valueInitialScrollBatch) < streams.length)}
+                                updateScroll={() => setPositionScrollBatch((positionScrollBatch + 1))}>
+                                <TableContainer component={Paper}>
+                                    <Table aria-label="customized table">
+                                        <TableBody>
+                                            {streams && getListScroll((positionScrollBatch * valueInitialScrollBatch)).map((row, key) => (
+                                                <TableRowStyle hover key={key}
+                                                    onClick={() => changeDeleteBatch(!(stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0), row._id)}>
+                                                    <TableCellStyle width={25} align="center">
+                                                        <Checkbox checked={stateArrayDeleteBatch.arrayDeleteBatch.filter(value => value === row._id).length > 0}
+                                                            onChange={(e) => changeDeleteBatch(e.target.checked, row._id)} />
+                                                    </TableCellStyle>
+                                                    <TableCellStyle scope="row" align="left">
+                                                        {row.name}
+                                                    </TableCellStyle>
+                                                </TableRowStyle>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </ScrollInfiniteList>
                         </Grid>
                     </Grid>
                 </DialogContent>
@@ -180,8 +198,6 @@ const StreamListView: React.FC<{ streams: any, streamsBatch: any, positionPage: 
                         <Card>
                             {filterListStreams()}
                             {getListStreams()}
-                            <PaginationList dataList={streams} valuePage={positionPage} countList={countStream} style={{ margin: 5 }}
-                                actionClick={(value: number) => changePagination(value)} />
                         </Card>
                     </Grid>
                 </Grid>
