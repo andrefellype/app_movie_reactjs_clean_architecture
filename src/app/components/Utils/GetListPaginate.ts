@@ -4,7 +4,8 @@ const GetListPaginate = function (list, positionPagination: number, valueLimit: 
             return list.filter((value, key) => key < valueLimit)
         }
         if (positionPagination > 1) {
-            return list.filter((value, key) => (key >= (valueLimit * (positionPagination - 1))) && (key < (valueLimit * positionPagination)))
+            return list.filter((value, key) => (key >= (valueLimit * (positionPagination - 1)))
+                && (key < (valueLimit * positionPagination)))
         }
     }
     return []

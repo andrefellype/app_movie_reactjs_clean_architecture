@@ -1,6 +1,10 @@
-import { STREAM_LIST_FILTER_REDUCER, STREAM_LIST_REDUCER, STREAM_SINGLE_REDUCER } from "../../core/consts"
+import {
+    STREAM_LIST_FILTER_REDUCER, STREAM_LIST_REDUCER, STREAM_SINGLE_REDUCER
+} from "../../core/consts"
 
-const stream = function (state: { stream: null, streams: [], streamsFilter: [] }, action) {
+const stream = function (state: {
+    stream: null, streams: [], streamsFilter: []
+}, action) {
     switch (action.type) {
         case STREAM_LIST_FILTER_REDUCER:
             return {

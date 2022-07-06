@@ -1,19 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable react/prefer-stateless-function */
 import { TableBody } from "@mui/material"
 import React from "react"
 import { MSG_EMPTY_LIST, MSG_FAIL_SYSTEM } from "../../core/consts"
 import TableCellStyle from "./TableCellStyle"
 import TableRowStyle from "./TableRowStyle"
 
-export default class TableBodyStyle extends React.Component<{ isLoading?: any | null, colSpanValue?: number, listData?: any }> {
+export default class TableBodyStyle extends React.Component<{
+    isLoading?: any | null, colSpanValue?: number, listData?: any
+}> {
     render() {
         const { isLoading, colSpanValue = 1, listData = [], children, ...other } = this.props
 
-        function verifyLoading(showStatusLoadingPattern) {
-            if (typeof showStatusLoadingPattern !== "undefined" && showStatusLoadingPattern !== null && typeof showStatusLoadingPattern.statusTable !== "undefined") {
-                return showStatusLoadingPattern.statusTable ? 1 : 0
+        function verifyLoading(showLoading) {
+            if (typeof showLoading !== "undefined" && showLoading !== null
+                && typeof showLoading.statusTable !== "undefined") {
+                return showLoading.statusTable ? 1 : 0
             }
             return -1
         }
@@ -26,11 +28,12 @@ export default class TableBodyStyle extends React.Component<{ isLoading?: any | 
             </TableRowStyle>)
         }
 
-        function titleLoading(showStatusLoadingPattern) {
+        function titleLoading(showLoading) {
             let msgTitle = ""
-            if (typeof showStatusLoadingPattern !== "undefined" && showStatusLoadingPattern !== null && typeof showStatusLoadingPattern.statusTable !== "undefined") {
-                if (showStatusLoadingPattern.statusTable)
-                    msgTitle = showStatusLoadingPattern.titleTable
+            if (typeof showLoading !== "undefined" && showLoading !== null
+                && typeof showLoading.statusTable !== "undefined") {
+                if (showLoading.statusTable)
+                    msgTitle = showLoading.titleTable
             } else
                 msgTitle = MSG_FAIL_SYSTEM
 
@@ -44,7 +47,8 @@ export default class TableBodyStyle extends React.Component<{ isLoading?: any | 
         }
 
         return (<TableBody {...other}>
-            {(typeof isLoading !== "undefined") && (verifyLoading(isLoading) !== 0 ? titleLoading(isLoading) : (bodyFields()))}
+            {(typeof isLoading !== "undefined") && (verifyLoading(isLoading) !== 0 ? titleLoading(isLoading)
+                : (bodyFields()))}
         </TableBody>)
     }
 }

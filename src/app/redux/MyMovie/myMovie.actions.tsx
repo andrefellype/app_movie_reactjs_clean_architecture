@@ -1,58 +1,39 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable no-underscore-dangle */
-import CryptographyConvert from "../../components/CryptographyConvert"
+import UpdateHeaderToken from "../../components/Utils/UpdateHeaderToken"
 import api from "../../core/api"
 import { MY_MOVIE_LIST_FILTER_REDUCER, MY_MOVIE_LIST_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteMyMovieByMovieId = (movieIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("mymovie/delete", { movieId: movieIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteByMovieIdInMyMovie = (movieIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.delete(`mymovie/delete/${movieIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerNeverWatchMovie = (movieIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { movieId: movieIdValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("mymovie/register/notwatch", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const createInMyMovie = (movieIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`mymovie/register/${movieIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerMyMovie = (movieIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { movieId: movieIdValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("mymovie/register", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-function orderMovies(myMovies, type: string) {
+function orderListInMyMovie(myMovies, type: string) {
     return myMovies.sort((myMovieA, myMovieB) => {
         if (myMovieA.movie !== null && myMovieB.movie !== null) {
             if (type === "title") {
@@ -116,8 +97,9 @@ function orderMovies(myMovies, type: string) {
     })
 }
 
-function searchMovies(myMovies, search: string) {
-    return myMovies.filter(myMovie => (myMovie.movie !== null && myMovie.movie.title.toLowerCase().indexOf(search.toLowerCase()) > -1))
+function searchListInMyMovie(myMovies, search: string) {
+    return myMovies.filter(myMovie => (myMovie.movie !== null
+        && myMovie.movie.title.toLowerCase().indexOf(search.toLowerCase()) > -1))
 }
 
 function filterRelease(release: string, movie) {
@@ -153,12 +135,15 @@ function filterDuration(durationMin: string, durationMax: string, movie) {
     return statusDurationMin && statusDurationMax
 }
 
-function filterMovies(myMovies, categoryId: string, release: string, durationMin: string, durationMax: string, countryId: string) {
+function filterListInMyMovie(myMovies, categoryId: string, release: string, durationMin: string, durationMax: string, countryId: string) {
     return myMovies.filter(myMovie => {
         if (
-            (categoryId.length === 0 || ((categoryId === "-1" && myMovie.movie.categories_id.length === 0) || (myMovie.movie.categories_id.filter(c => c === categoryId).length > 0))) &&
-            (release.length === 0 || filterRelease(release, myMovie.movie)) && filterDuration(durationMin, durationMax, myMovie.movie) &&
-            (countryId.length === 0 || ((countryId === "-1" && myMovie.movie.countries_id.length === 0) || (myMovie.movie.countries_id.filter(c => c === countryId).length > 0)))
+            (categoryId.length === 0 || ((categoryId === "-1" && myMovie.movie.categories_id.length === 0)
+                || (myMovie.movie.categories_id.filter(c => c === categoryId).length > 0))) &&
+            (release.length === 0 || filterRelease(release, myMovie.movie))
+            && filterDuration(durationMin, durationMax, myMovie.movie) &&
+            (countryId.length === 0 || ((countryId === "-1" && myMovie.movie.countries_id.length === 0) ||
+                (myMovie.movie.countries_id.filter(c => c === countryId).length > 0)))
         ) {
             return true
         }
@@ -166,62 +151,69 @@ function filterMovies(myMovies, categoryId: string, release: string, durationMin
     })
 }
 
-export const getMyMovieDetailsMovieAll = (myMoviesGeneral, myMoviesPagination, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const idsMovie: any[] = []
-    for (let mg = 0; mg < myMoviesGeneral.length; mg++) {
-        let statusDetails = false
-        for (let m = 0; m < myMoviesPagination.length; m++) {
-            if (myMoviesPagination[m].movie_id === myMoviesGeneral[mg].movie_id) {
-                statusDetails = true
+export const openAllDetailInMyMovie = (myMoviesGeneral, myMoviesPagination, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const idsMovie: any[] = []
+        for (let mg = 0; mg < myMoviesGeneral.length; mg++) {
+            let statusDetails = false
+            for (let m = 0; m < myMoviesPagination.length; m++) {
+                if (myMoviesPagination[m].movie_id === myMoviesGeneral[mg].movie_id) {
+                    statusDetails = true
+                }
+            }
+            if (statusDetails) {
+                idsMovie.push(myMoviesGeneral[mg].movie_id)
             }
         }
-        if (statusDetails) {
-            idsMovie.push(myMoviesGeneral[mg].movie_id)
-        }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.post("movie/open/details/all", { movieIds: idsMovie }).then(response => {
+            if (response.data.status) {
+                const moviesData = response.data.datas
+                const moviesNew = myMoviesGeneral.map(m => {
+                    const moviesDataFilter = moviesData.filter(md => md._id === m.movie_id)
+                    if (moviesDataFilter.length > 0)
+                        m.movie = moviesDataFilter[0]
+                    return m
+                })
+                dispatch({ type: MY_MOVIE_LIST_FILTER_REDUCER, myMovies: moviesNew })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
     }
-    await api.post("movie/open/details/all", { movieIds: idsMovie, object: { category: true, country: true } }).then(response => {
-        if (response.data.status) {
-            const moviesData = response.data.datas
-            const moviesNew = myMoviesGeneral.map(m => {
-                const moviesDataFilter = moviesData.filter(md => md._id === m.movie_id)
-                if (moviesDataFilter.length > 0)
-                    m.movie = moviesDataFilter[0]
-                return m
-            })
-            dispatch({ type: MY_MOVIE_LIST_FILTER_REDUCER, myMovies: moviesNew })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
 
-export const getMyMovieAllByOrderAndSearchAndFilter = (orderValue: string, searchValue: string, categoryValue: string, releaseValue: string, durationMinValue: string, durationMaxValue: string, countryValue: string, myMoviesGeneral: []) => async dispatch => {
-    let myMoviesValue = filterMovies(myMoviesGeneral, categoryValue, releaseValue, durationMinValue, durationMaxValue, countryValue)
-    myMoviesValue = searchMovies(myMoviesValue, searchValue)
-    myMoviesValue = orderMovies(myMoviesValue, orderValue)
-    dispatch({ type: MY_MOVIE_LIST_FILTER_REDUCER, myMovies: myMoviesValue })
-}
+export const openAllByOrderAndSearchAndFilterInMyMovie = (orderValue: string, searchValue: string, categoryValue: string,
+    releaseValue: string, durationMinValue: string, durationMaxValue: string, countryValue: string, myMoviesGeneral: []) => async dispatch => {
+        let myMoviesValue = filterListInMyMovie(myMoviesGeneral, categoryValue, releaseValue, durationMinValue, durationMaxValue, countryValue)
+        myMoviesValue = searchListInMyMovie(myMoviesValue, searchValue)
+        myMoviesValue = orderListInMyMovie(myMoviesValue, orderValue)
+        dispatch({ type: MY_MOVIE_LIST_FILTER_REDUCER, myMovies: myMoviesValue })
+    }
 
-export const getMyMovieAll = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void, orderValue = "title", searchTextValue = "", categoryValue = "", releaseValue = "", durationMinValue = "", durationMaxValue = "", countryValue = "") => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("mymovie/open/all", { object: { category: true, country: true } }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.datas
-            const myMoviesValue = dataApi
-            let myMoviesFilterValue = filterMovies(myMoviesValue, categoryValue, releaseValue, durationMinValue, durationMaxValue, countryValue)
-            myMoviesFilterValue = searchMovies(myMoviesFilterValue, searchTextValue)
-            myMoviesFilterValue = orderMovies(myMoviesValue, orderValue)
-            dispatch({ type: MY_MOVIE_LIST_REDUCER, myMovies: myMoviesValue, myMoviesFilter: myMoviesFilterValue })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
+export const openAllInMyMovie = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void, orderValue = "title",
+    searchTextValue = "", categoryValue = "", releaseValue = "", durationMinValue = "", durationMaxValue = "", countryValue = "") => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("mymovie/open").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const myMoviesValue = dataApi
+                let myMoviesFilterValue = filterListInMyMovie(myMoviesValue, categoryValue, releaseValue, durationMinValue, durationMaxValue, countryValue)
+                myMoviesFilterValue = searchListInMyMovie(myMoviesFilterValue, searchTextValue)
+                myMoviesFilterValue = orderListInMyMovie(myMoviesValue, orderValue)
+                dispatch({ type: MY_MOVIE_LIST_REDUCER, myMovies: myMoviesValue, myMoviesFilter: myMoviesFilterValue })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const clearAllInMyMovie = () => async dispatch => {
+    dispatch({ type: MY_MOVIE_LIST_REDUCER, myMovies: [], myMoviesFilter: [] })
 }

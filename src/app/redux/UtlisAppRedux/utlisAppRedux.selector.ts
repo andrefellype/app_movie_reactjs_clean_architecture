@@ -1,3 +1,3 @@
-export const showStatusLoading = state => state.utilsAppLoading
+export const isStatusLoading = state => state.utilsAppLoading
 export const getMsgAlert = state => state.utilsAppMsg
-export const showStatusScrollToTop = state => state.utilsAppScrollToTop.scrollToTop
+export const isStatusScrollToTop = state => state.utilsAppScrollToTop.scrollToTop

@@ -1,6 +1,8 @@
 import { MSG_ALERT_REDUCER, FAIL_PAGE_REDUCER } from "../../core/consts"
 
-const utilsAppReduxMsg = function (state: { title: null, icon: null, type: 'message' | 'fail_page', msgs: [], confirmButton: null }, action) {
+const utilsAppReduxMsg = function (state: {
+    title: null, icon: null, type: 'message' | 'fail_page', msgs: [], confirmButton: null
+}, action) {
     switch (action.type) {
         case FAIL_PAGE_REDUCER:
             return {

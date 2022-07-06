@@ -15,7 +15,8 @@ function dateToString(value: Date) {
     return `${yearStr}-${monthStr}-${dayStr}`
 }
 
-function stringEUAToArrayDateBRAndTime(value: string, isYear = true, isMonth = true, isDay = true, isHour = true, isMinutes = true, isSeconds = true) {
+function stringEUAToArrayDateBRAndTime(
+    value: string, isYear = true, isMonth = true, isDay = true, isHour = true, isMinutes = true, isSeconds = true) {
     const year = value.substring(0, 4)
     const month = value.substring(5, 7)
     const day = value.substring(8, 10)
@@ -27,7 +28,8 @@ function stringEUAToArrayDateBRAndTime(value: string, isYear = true, isMonth = t
     return [dateStr, hourStr]
 }
 
-function stringEUAToArrayDateBRAndTimeNoSeconds(value: string, isYear = true, isMonth = true, isDay = true, isHour = true, isMinutes = true) {
+function stringEUAToArrayDateBRAndTimeNoSeconds(
+    value: string, isYear = true, isMonth = true, isDay = true, isHour = true, isMinutes = true) {
     const year = value.substring(0, 4)
     const month = value.substring(5, 7)
     const day = value.substring(8, 10)

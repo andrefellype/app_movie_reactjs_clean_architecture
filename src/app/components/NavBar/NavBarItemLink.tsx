@@ -11,7 +11,9 @@ const NavBarItemLink: React.FC<NavBarItemModel> = function ({ icon, title, badge
         <ListItem component={ComponentLink} to={redirectUrl} button>
             <ListItemIcon>
                 <Badge badgeContent={badgeText} color={badgeText ? "error" : "default"}>
-                    {icon && <IconList icon={icon} sizeIcon="medium" style={{ color: '#000000', marginTop: 1, marginRight: 20 }} />}
+                    {icon && <IconList icon={icon} sizeIcon="medium" style={{
+                        color: '#000000', marginTop: 1, marginRight: 20
+                    }} />}
                 </Badge>
                 {title && <ListItemText primary={<b style={{ color: '#000000' }}>{title}</b>} />}
             </ListItemIcon>

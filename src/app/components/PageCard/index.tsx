@@ -24,11 +24,15 @@ const styles = (theme) => ({
 })
 
 class PageCard extends React.Component<{
-    children?, title: string, spacingContainer?: GridSpacing, colorTitle?: string, sizeXl?: GridSize, sizeLg?: GridSize, sizeMd?: GridSize, sizeSm?: GridSize, sizeXs?: GridSize, style?: object
+    children?, title: string, spacingContainer?: GridSpacing, colorTitle?: string, sizeXl?: GridSize,
+    sizeLg?: GridSize, sizeMd?: GridSize, sizeSm?: GridSize, sizeXs?: GridSize, style?: object
 }> {
 
     render() {
-        const { title, spacingContainer = 2, colorTitle, sizeXl, sizeLg, sizeMd, sizeSm, sizeXs = 12, children, ...other } = this.props
+        const {
+            title, spacingContainer = 2, colorTitle, sizeXl, sizeLg, sizeMd, sizeSm, sizeXs = 12,
+            children, ...other
+        } = this.props
 
         function valueGrid(type: string | null = null) {
             if (type === "xl" && sizeXl) {
@@ -40,7 +44,8 @@ class PageCard extends React.Component<{
             if ((type === "md" || (type === "lg" && !sizeLg) || (type === "xl" && !sizeXl && !sizeLg)) && sizeMd) {
                 return sizeMd
             }
-            if ((type === "sm" || (type === "md" && !sizeMd) || (type === "lg" && !sizeLg && !sizeMd) || (type === "xl" && !sizeXl && !sizeLg && !sizeMd)) && sizeSm) {
+            if ((type === "sm" || (type === "md" && !sizeMd) || (type === "lg" && !sizeLg && !sizeMd)
+                || (type === "xl" && !sizeXl && !sizeLg && !sizeMd)) && sizeSm) {
                 return sizeSm
             }
             return sizeXs
@@ -50,10 +55,12 @@ class PageCard extends React.Component<{
             <Page title={title} className={this.props['classes'].root} {...other}>
                 <Container maxWidth={false}>
                     <Grid container spacing={spacingContainer} style={{ marginBottom: 8 }}>
-                        <Grid item xl={valueGrid("xl")} lg={valueGrid("lg")} md={valueGrid("md")} sm={valueGrid("sm")} xs={valueGrid("xs")}>
+                        <Grid item xl={valueGrid("xl")} lg={valueGrid("lg")} md={valueGrid("md")}
+                            sm={valueGrid("sm")} xs={valueGrid("xs")}>
                             <Card>
                                 <CardActions className={this.props['classes'].flex_center}>
-                                    <Typography style={{ fontWeight: 'bold', color: colorTitle }} variant="h6" component="h6">
+                                    <Typography style={{ fontWeight: 'bold', color: colorTitle }} variant="h6"
+                                        component="h6">
                                         {title}
                                     </Typography>
                                 </CardActions>

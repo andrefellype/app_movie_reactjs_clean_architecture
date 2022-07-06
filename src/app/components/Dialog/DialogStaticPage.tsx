@@ -4,7 +4,6 @@ import { Dialog, DialogContent, Typography } from '@mui/material'
 import React from 'react'
 
 class DialogStaticPage extends React.Component<{ messageDialog: string, showDialog: boolean, style?: object }> {
-
     render() {
         const { messageDialog, showDialog, children, ...other } = this.props
 

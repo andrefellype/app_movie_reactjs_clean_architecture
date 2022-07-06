@@ -15,12 +15,16 @@ const NavBarItemNotifications: React.FC<NavBarItemModel> = function ({ icon, tit
             <ListItem button onClick={() => setShowNotification(true)}>
                 <ListItemIcon>
                     <Badge badgeContent={badgeText} color={badgeText ? "error" : "default"}>
-                        {icon && <IconList icon={icon} sizeIcon="medium" style={{ color: '#000000', marginTop: 1, marginRight: 20 }} />}
+                        {icon && <IconList icon={icon} sizeIcon="medium" style={{
+                            color: '#000000', marginTop: 1, marginRight: 20
+                        }} />}
                     </Badge>
                     {title && <ListItemText primary={<b style={{ color: '#000000' }}>{title}</b>} />}
                 </ListItemIcon>
             </ListItem>
-            <DialogList onCloseDialog={() => setShowNotification(true)} clickCloseDialog={() => setShowNotification(false)} showDialog={showNotification} listDialog={notifications} />
+            <DialogList onCloseDialog={() => setShowNotification(true)}
+                clickCloseDialog={() => setShowNotification(false)} showDialog={showNotification}
+                listDialog={notifications} />
         </React.Fragment>
     )
 }

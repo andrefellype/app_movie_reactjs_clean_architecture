@@ -1,6 +1,10 @@
-import { MOVIE_LIST_FILTER_REDUCER, MOVIE_LIST_REDUCER, MOVIE_SINGLE_REDUCER } from "../../core/consts"
+import {
+    MOVIE_LIST_FILTER_REDUCER, MOVIE_LIST_REDUCER, MOVIE_SINGLE_REDUCER
+} from "../../core/consts"
 
-const movie = function (state: { movie: null, movies: [], moviesFilter: [] }, action) {
+const movie = function (state: {
+    movie: null, movies: [], moviesFilter: []
+}, action) {
     switch (action.type) {
         case MOVIE_LIST_FILTER_REDUCER:
             return {

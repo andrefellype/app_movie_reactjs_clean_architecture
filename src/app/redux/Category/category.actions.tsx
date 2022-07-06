@@ -1,86 +1,83 @@
-import CryptographyConvert from "../../components/CryptographyConvert"
+import UpdateHeaderToken from "../../components/Utils/UpdateHeaderToken"
 import api from "../../core/api"
-import { CATEGORY_LIST_FILTER_REDUCER, CATEGORY_LIST_REDUCER, CATEGORY_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
+import {
+    CATEGORY_LIST_FILTER_REDUCER, CATEGORY_LIST_REDUCER, CATEGORY_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE
+} from "../../core/consts"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateCategoryById = (categoryIdValue: string, nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { categoryId: categoryIdValue, name: nameValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("category/update", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteAllByIdsInCategory = (_ids: string[], callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put("category/delete", { categoryId: JSON.stringify(_ids) }).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-export const openCategoryById = (categoryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("category/open", { categoryId: categoryIdValue }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            dispatch({ type: CATEGORY_SINGLE_REDUCER, categorySingle: dataApi })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteByIdInCategory = (categoryIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.delete(`category/delete/${categoryIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerCategory = (nameValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { name: nameValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("category/register", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const updateByIdInCategory = (categoryIdValue: string, nameValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put(`category/update/${categoryIdValue}`, { name: nameValue }).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralCategoryByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("category/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const openInCategory = (categoryIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`category/open/${categoryIdValue}`).then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                dispatch({ type: CATEGORY_SINGLE_REDUCER, categorySingle: dataApi })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteCategoryById = (categoryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("category/delete", { categoryId: categoryIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const createInCategory = (nameValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        const objectData = { name: nameValue }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.post("category/register", objectData).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-function orderCategoriesByName(categories) {
+function orderListInCategory(categories) {
     return categories.sort((categoryA, categoryB) => {
         if (categoryA.name.toLowerCase() > categoryB.name.toLowerCase()) {
             return 1
@@ -92,32 +89,34 @@ function orderCategoriesByName(categories) {
     })
 }
 
-function searchCategories(categories, search: string) {
+function searchListInCategory(categories, search: string) {
     return categories.filter(category => category.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 
-export const getCategoryAllBySearch = (searchValue: string, categoriesGeneral: []) => async dispatch => {
-    let categoriesValue = searchCategories(categoriesGeneral, searchValue)
-    categoriesValue = orderCategoriesByName(categoriesValue)
+export const openAllBySearchInCategory = (searchValue: string, categoriesGeneral: []) => async dispatch => {
+    let categoriesValue = searchListInCategory(categoriesGeneral, searchValue)
+    categoriesValue = orderListInCategory(categoriesValue)
     dispatch({ type: CATEGORY_LIST_FILTER_REDUCER, categories: categoriesValue })
 }
 
-export const getCategoryAll = (callbackSuccess: (() => void) | null, callbackError: (errorsMsg: string[]) => void, search = "") => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("category/open/all").then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.datas
-            const categoriesValue = orderCategoriesByName(dataApi)
-            const categoriesFilterValue = searchCategories(categoriesValue, search)
-            dispatch({ type: CATEGORY_LIST_REDUCER, categories: categoriesValue, categoriesFilter: categoriesFilterValue })
-            if (typeof callbackSuccess !== "undefined" && callbackSuccess !== null) {
-                callbackSuccess()
+export const openAllInCategory = (callbackSuccess: (() => void) | null, callbackError: (errorsMsg: string[]) => void,
+    search = "") => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("category/open").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const categoriesValue = orderListInCategory(dataApi)
+                const categoriesFilterValue = searchListInCategory(categoriesValue, search)
+                dispatch({
+                    type: CATEGORY_LIST_REDUCER, categories: categoriesValue, categoriesFilter: categoriesFilterValue
+                })
+                if (typeof callbackSuccess !== "undefined" && callbackSuccess !== null) {
+                    callbackSuccess()
+                }
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
             }
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }

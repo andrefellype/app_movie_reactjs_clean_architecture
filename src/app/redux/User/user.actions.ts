@@ -1,109 +1,114 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import ConvertDate from "../../components/Utils/ConvertDate"
-import CryptographyConvert from "../../components/CryptographyConvert"
 import api from "../../core/api"
-import { TOKEN_LOCAL_STORAGE, URL_FAIL_PAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER, USER_LOCAL_STORAGE, USER_SINGLE_REDUCER } from "../../core/consts"
+import {
+    TOKEN_LOCAL_STORAGE, URL_FAIL_PAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER,
+    USER_LOCAL_STORAGE, USER_SINGLE_REDUCER
+} from "../../core/consts"
+import SetLocalStorage from "../../components/Utils/SetLocalStorage"
+import UpdateHeaderToken from "../../components/Utils/UpdateHeaderToken"
+import GetLocalStorage from "../../components/Utils/GetLocalStorage"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updatePasswordById = (userIdValue: string, passwordValue: string, confirmPassword: string, callbackSuccess: () => void, callbackError: (errorMsg) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    const objectData = { userId: userIdValue, password: passwordValue, password_confirm: confirmPassword }
-    await api.post("user/update/password", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-export const openUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void, callbackUser: ((userActual) => void) | null = null) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/open", { userId: userIdValue }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi })
-            callbackSuccess()
-            if (callbackUser !== null) {
-                callbackUser(dataApi)
+export const updatePasswordByIdInUser = (userIdValue: string, passwordValue: string,
+    confirmPassword: string, callbackSuccess: () => void, callbackError: (errorMsg) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        const objectData = { password: passwordValue, password_confirm: confirmPassword }
+        await api.put(`user/update/password/${userIdValue}`, objectData).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
             }
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const openInUser = (userIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorMsg: string[]) => void, callbackUser: ((userActual) => void) | null = null) => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`user/open/${userIdValue}`).then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi })
+                callbackSuccess()
+                if (callbackUser !== null) {
+                    callbackUser(dataApi)
+                }
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const createInUser = (nameValue: string, birthValue: string, emailValue: string,
+    cellphoneValue: string, passwordValue: string, confirmPasswordValue: string, levelValue: string,
+    callbackSuccess: () => void, callbackError: (errorsMsg) => void) => async () => {
+        const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
+        const birthEUA = birthValue.length > 0 ?
+            `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
+        const objectData = {
+            name: nameValue, birth: birthEUA, email: emailValue, cellphone: cellphoneNumber,
+            password: passwordValue, password_confirm: confirmPasswordValue, level: levelValue
         }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerUser = (nameValue: string, birthValue: string, emailValue: string, cellphoneValue: string, passwordValue: string, confirmPasswordValue: string, levelValue: string, callbackSuccess: () => void, callbackError: (errorsMsg) => void) => async dispatch => {
-    const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
-    const birthEUA = birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
-    const objectData = { name: nameValue, birth: birthEUA, email: emailValue, cellphone: cellphoneNumber, password: passwordValue, password_confirm: confirmPasswordValue, level: levelValue }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.post("user/register", objectData).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/register", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteAllByIdsInUser = (_ids: string[], callbackSuccess: () => void,
+    callbackError: (errorMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put("user/delete", { userId: JSON.stringify(_ids) }).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralUserByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteByIdInUser = (userIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.delete(`user/delete/${userIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/delete", { userId: userIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const updateEnabledByIdInUser = (userIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`user/update/enabled/${userIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateEnabledUserById = (userIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/update/enabled", { userId: userIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-function orderUsers(users, type: string) {
+function orderListInUser(users, type: string) {
     return users.sort((userA, userB) => {
         if (type === "name") {
             if (userA.name.toLowerCase() > userB.name.toLowerCase()) {
@@ -152,7 +157,7 @@ function orderUsers(users, type: string) {
     })
 }
 
-function filterUsers(users, level: string) {
+function filterListInUser(users, level: string) {
     return users.filter(user => {
         if (level.length === 0 || level === user.level) {
             return true
@@ -161,146 +166,144 @@ function filterUsers(users, level: string) {
     })
 }
 
-function searchUsers(users, search: string) {
+function searchListInUser(users, search: string) {
     return users.filter(user => user.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 
-export const getUserAllByOrderAndSearchAndFilter = (orderValue: string, searchValue: string, levelValue: string, usersGeneral: []) => async dispatch => {
-    let usersValue = filterUsers(usersGeneral, levelValue)
-    usersValue = searchUsers(usersValue, searchValue)
-    usersValue = orderUsers(usersValue, orderValue)
-    dispatch({ type: USER_LIST_FILTER_REDUCER, users: usersValue })
-}
+export const openAllByOrderAndSearchAndFilterInUser = (orderValue: string, searchValue: string,
+    levelValue: string, usersGeneral: []) => async dispatch => {
+        let usersValue = filterListInUser(usersGeneral, levelValue)
+        usersValue = searchListInUser(usersValue, searchValue)
+        usersValue = orderListInUser(usersValue, orderValue)
+        dispatch({ type: USER_LIST_FILTER_REDUCER, users: usersValue })
+    }
 
-export const getUserAll = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void, order = "name", search = "", level = "") => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/open/all").then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.datas
-            const usersValue = dataApi
-            let usersFilterValue = filterUsers(usersValue, level)
-            usersFilterValue = searchUsers(usersFilterValue, search)
-            usersFilterValue = orderUsers(usersFilterValue, order)
-            dispatch({ type: USER_LIST_REDUCER, users: usersValue, usersFilter: usersFilterValue })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-export const updatePasswordUserByToken = (passwordValue: string, confirmPasswordValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { password: passwordValue, password_confirm: confirmPasswordValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/update/password/token", objectData).then(response => {
-        if (response.data.status) {
-            let userLocal: any = localStorage.getItem(USER_LOCAL_STORAGE)
-            if (userLocal !== null)
-                userLocal = CryptographyConvert("base64", userLocal, "decode")
-            if (userLocal)
-                userLocal = JSON.parse(userLocal)
-            if (userLocal) {
-                const dataApi = response.data.data
-                userLocal.password = dataApi.password
-                localStorage.setItem(USER_LOCAL_STORAGE, CryptographyConvert("base64", JSON.stringify(userLocal), "encode"))
-                localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
-                dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi.user })
+export const openAllInUser = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void,
+    order = "name", search = "", level = "") => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("user/open").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const usersValue = dataApi
+                let usersFilterValue = filterListInUser(usersValue, level)
+                usersFilterValue = searchListInUser(usersFilterValue, search)
+                usersFilterValue = orderListInUser(usersFilterValue, order)
+                dispatch({ type: USER_LIST_REDUCER, users: usersValue, usersFilter: usersFilterValue })
                 callbackSuccess()
-            }
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-export const updateUserByToken = (nameValue: string, birthValue: string, emailValue: string, cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
-    const birthEUA = birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
-
-    const objectData = { name: nameValue, birth: birthEUA, email: emailValue, cellphone: cellphoneNumber }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("user/update/token", objectData).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            let userLocal: any = localStorage.getItem(USER_LOCAL_STORAGE)
-            if (userLocal !== null) {
-                userLocal = CryptographyConvert("base64", userLocal, "decode")
-            }
-            if (userLocal !== null) {
-                userLocal = JSON.parse(userLocal)
-            }
-            if (userLocal !== null) {
-                userLocal.name = dataApi.name
-                userLocal.cellphone = dataApi.cellphone
-                userLocal.password = dataApi.password
-                userLocal.photo = dataApi.photo
-                localStorage.setItem(USER_LOCAL_STORAGE, CryptographyConvert("base64", JSON.stringify(userLocal), "encode"))
-                localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
-                dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi.user })
-                callbackSuccess()
-            }
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-export const openUserByToken = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.get("user/open/token").then(response => {
-        if (response.data.status) {
-            dispatch({ type: USER_SINGLE_REDUCER, userSingle: response.data.data })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-export const updatePasswordUserByCodeRecovery = async (codeValue: string, passwordValue: string, confirmPasswordValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => {
-    const objectData = { code: codeValue, password: passwordValue, password_confirm: confirmPasswordValue }
-    await api.post("user/update/password/coderecovery", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-export const openUserByCodeRecovery = (codeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[] | string) => void) => async dispatch => {
-    const objectData = { code: codeValue }
-    await api.post("user/open/coderecovery", objectData).then(response => {
-        if (response.data.status) {
-            dispatch({ type: USER_SINGLE_REDUCER, userSingle: response.data.data })
-            callbackSuccess()
-        } else {
-            if (response.data.errors.length === 1) {
-                callbackError(response.data.errors[0].msg)
             } else {
                 callbackError(response.data.errors.map(erro => `${erro.msg}`))
             }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const updatePasswordByTokenInUser = (passwordValue: string, confirmPasswordValue: string,
+    callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        const objectData = { password: passwordValue, password_confirm: confirmPasswordValue }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put("user/update/password/token", objectData).then(response => {
+            if (response.data.status) {
+                let userLocal: any = GetLocalStorage(USER_LOCAL_STORAGE)
+                if (userLocal)
+                    userLocal = JSON.parse(userLocal)
+                if (userLocal) {
+                    const dataApi = response.data.data
+                    userLocal.password = dataApi.password
+                    SetLocalStorage(USER_LOCAL_STORAGE, JSON.stringify(userLocal))
+                    SetLocalStorage(TOKEN_LOCAL_STORAGE, dataApi.token)
+                    dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi.user })
+                    callbackSuccess()
+                }
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const updateByTokenInUser = (nameValue: string, birthValue: string, emailValue: string,
+    cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
+        const birthEUA =
+            birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
+        const objectData = { name: nameValue, birth: birthEUA, email: emailValue, cellphone: cellphoneNumber }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put("user/update/token", objectData).then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                let userLocal: any = GetLocalStorage(USER_LOCAL_STORAGE)
+                if (userLocal !== null) {
+                    userLocal = JSON.parse(userLocal)
+                }
+                if (userLocal !== null) {
+                    userLocal.name = dataApi.name
+                    userLocal.cellphone = dataApi.cellphone
+                    userLocal.password = dataApi.password
+                    userLocal.photo = dataApi.photo
+                    SetLocalStorage(USER_LOCAL_STORAGE, JSON.stringify(userLocal))
+                    SetLocalStorage(TOKEN_LOCAL_STORAGE, dataApi.token)
+                    dispatch({ type: USER_SINGLE_REDUCER, userSingle: dataApi.user })
+                    callbackSuccess()
+                }
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const openByTokenInUser = (callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("user/open/token").then(response => {
+            if (response.data.status) {
+                dispatch({ type: USER_SINGLE_REDUCER, userSingle: response.data.data })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const updatePasswordByCodeRecoveryInUser = async (codeValue: string, passwordValue: string,
+    confirmPasswordValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => {
+    const objectData = { password: passwordValue, password_confirm: confirmPasswordValue }
+    await api.put(`user/update/password/coderecovery/${codeValue}`, objectData).then(response => {
+        if (response.data.status) {
+            callbackSuccess()
+        } else {
+            callbackError(response.data.errors.map(erro => `${erro.msg}`))
         }
     }).catch(() => {
         window.location.href = "/failpage/error_api"
     })
 }
 
-export const recoveryPasswordUser = async (cellphoneValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => {
+export const openByCodeRecoveryInUser = (codeValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[] | string) => void) => async dispatch => {
+        await api.get(`user/open/coderecovery/${codeValue}`).then(response => {
+            if (response.data.status) {
+                dispatch({ type: USER_SINGLE_REDUCER, userSingle: response.data.data })
+                callbackSuccess()
+            } else {
+                if (response.data.errors.length === 1) {
+                    callbackError(response.data.errors[0].msg)
+                } else {
+                    callbackError(response.data.errors.map(erro => `${erro.msg}`))
+                }
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const createRecoveryPasswordInUser = async (cellphoneValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => {
     const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
     const objectData = { cellphone: cellphoneNumber }
     await api.post("user/recovery/password", objectData).then(response => {
@@ -314,16 +317,15 @@ export const recoveryPasswordUser = async (cellphoneValue: string, callbackSucce
     })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const isVerifyUserAndToken = (callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+export const updateTokenInUser = (callbackError: (errorsMsg: string[]) => void) => async () => {
     if (window.location.pathname.indexOf(URL_FAIL_PAGE) === -1) {
         const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
         if (token !== null) {
-            api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-            await api.post("user/refresh/token").then(response => {
+            UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+            await api.get("user/refresh/token").then(response => {
                 if (response.data.status) {
                     const dataApi = response.data.data
-                    localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
+                    SetLocalStorage(TOKEN_LOCAL_STORAGE, dataApi.token)
                 } else {
                     callbackError(response.data.errors.map(erro => `${erro.msg}`))
                 }
@@ -334,25 +336,26 @@ export const isVerifyUserAndToken = (callbackError: (errorsMsg: string[]) => voi
     }
 }
 
-export const signInUser = (cellphoneValue: string, passwordValue: string, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
-    const objectData = {
-        cellphone: cellphoneNumber, password: passwordValue
-    }
-    await api.post("user/signin", objectData).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            localStorage.setItem(USER_LOCAL_STORAGE, CryptographyConvert("base64", JSON.stringify(dataApi), "encode"))
-            localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
-            dispatch({ type: USER_ACCESS_REDUCER, userAccess: dataApi.user, tokenAccess: dataApi.token })
-            window.location.reload()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+export const signInUser = (cellphoneValue: string, passwordValue: string, callbackError: (errorsMsg: string[]) => void) =>
+    async dispatch => {
+        const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
+        const objectData = {
+            cellphone: cellphoneNumber, password: passwordValue
         }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+        await api.post("user/signin", objectData).then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                SetLocalStorage(USER_LOCAL_STORAGE, JSON.stringify(dataApi))
+                SetLocalStorage(TOKEN_LOCAL_STORAGE, dataApi.token)
+                dispatch({ type: USER_ACCESS_REDUCER, userAccess: dataApi.user, tokenAccess: dataApi.token })
+                window.location.reload()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
 export const signOutUser = () => async dispatch => {
     localStorage.clear()
@@ -360,23 +363,27 @@ export const signOutUser = () => async dispatch => {
     window.location.reload()
 }
 
-export const signUpUser = (nameValue: string, birthValue: string, cellphoneValue: string, emailValue: string, passwordValue: string, confirmPasswordValue: string, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const cellphoneNumber = cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
-    const birthEUA = birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
-
-    const objectData = { name: nameValue, birth: birthEUA, cellphone: cellphoneNumber, email: emailValue, password: passwordValue, password_confirm: confirmPasswordValue }
-
-    await api.post("user/signup", objectData).then(async response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            localStorage.setItem(USER_LOCAL_STORAGE, CryptographyConvert("base64", JSON.stringify(dataApi), "encode"))
-            localStorage.setItem(TOKEN_LOCAL_STORAGE, CryptographyConvert("base64", dataApi.token, "encode"))
-            dispatch({ type: USER_ACCESS_REDUCER, userAccess: dataApi.user, tokenAccess: dataApi.token })
-            window.location.reload()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
+export const signUpUser = (nameValue: string, birthValue: string, cellphoneValue: string, emailValue: string,
+    passwordValue: string, confirmPasswordValue: string, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        const cellphoneNumber =
+            cellphoneValue ? cellphoneValue.replace(/\D+/g, '') : cellphoneValue
+        const birthEUA =
+            birthValue.length > 0 ? `${birthValue.substring(6, 10)}-${birthValue.substring(3, 5)}-${birthValue.substring(0, 2)}` : null
+        const objectData = {
+            name: nameValue, birth: birthEUA, cellphone: cellphoneNumber, email: emailValue,
+            password: passwordValue, password_confirm: confirmPasswordValue
         }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+        await api.post("user/signup", objectData).then(async response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                SetLocalStorage(USER_LOCAL_STORAGE, JSON.stringify(dataApi))
+                SetLocalStorage(TOKEN_LOCAL_STORAGE, dataApi.token)
+                dispatch({ type: USER_ACCESS_REDUCER, userAccess: dataApi.user, tokenAccess: dataApi.token })
+                window.location.reload()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }

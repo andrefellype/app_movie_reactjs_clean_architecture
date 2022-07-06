@@ -1,104 +1,108 @@
 /* eslint-disable no-underscore-dangle */
-import CryptographyConvert from "../../components/CryptographyConvert"
+import UpdateHeaderToken from "../../components/Utils/UpdateHeaderToken"
 import api from "../../core/api"
-import { TOKEN_LOCAL_STORAGE, TV_SHOW_LIST_FILTER_REDUCER, TV_SHOW_LIST_REDUCER, TV_SHOW_SINGLE_REDUCER } from "../../core/consts"
+import {
+    TOKEN_LOCAL_STORAGE, TV_SHOW_LIST_FILTER_REDUCER, TV_SHOW_LIST_REDUCER, TV_SHOW_SINGLE_REDUCER
+} from "../../core/consts"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralTvShowByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteTvShowById = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/delete", { tvShowId: tvShowIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedReviewedTvShowById = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/approved/reviewed", { tvShowId: tvShowIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateTvShowById = (tvShowIdValue: string, titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = {
-        tvShowId: tvShowIdValue, title: titleValue, release: releaseValue, categories: categoriesValue, countries: countriesValue, streams: streamsValue, resume: resumeValue
+export const deleteAllByIdsInTvShow = (_ids: string[], callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put("tvshow/delete", { tvShowId: JSON.stringify(_ids) }).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
     }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/update", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
 
-export const openTvShowById = (tvShowIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/open", { tvShowId: tvShowIdValue }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            dispatch({ type: TV_SHOW_SINGLE_REDUCER, tvShowSingle: dataApi })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteByIdInTvShow = (tvShowIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.delete(`tvshow/delete/${tvShowIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerTvShow = (titleValue: string, releaseValue: string, categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { title: titleValue, release: releaseValue, categories: categoriesValue, countries: countriesValue, streams: streamsValue, resume: resumeValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/register", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const updateEnabledByIdInTvShow = (tvShowIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`tvshow/approved/${tvShowIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-function orderTvShows(tvShows, type: string) {
+export const updateByIdInTvShow = (tvShowIdValue: string, titleValue: string, releaseValue: string,
+    categoriesValue: [], countriesValue: [], streamsValue: [], resumeValue: string,
+    callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async () => {
+        const objectData = {
+            title: titleValue, release: releaseValue, categories: categoriesValue, countries: countriesValue,
+            streams: streamsValue, resume: resumeValue
+        }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put(`tvshow/update/${tvShowIdValue}`, objectData).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const openInTvShow = (tvShowIdValue: string, callbackSuccess: (() => void) | null,
+    callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`tvshow/open/${tvShowIdValue}`).then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                dispatch({ type: TV_SHOW_SINGLE_REDUCER, tvShowSingle: dataApi })
+                if (callbackSuccess !== null)
+                    callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const createInTvShow = (titleValue: string, releaseValue: string, categoriesValue: [],
+    countriesValue: [], streamsValue: [], resumeValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        const objectData = {
+            title: titleValue, release: releaseValue, categories: categoriesValue, countries: countriesValue,
+            streams: streamsValue, resume: resumeValue
+        }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.post("tvshow/register", objectData).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+function orderListInTvShow(tvShows, type: string) {
     return tvShows.sort((tvShowA, tvShowB) => {
         if (type === "title") {
             if (tvShowA.title.toLowerCase() > tvShowB.title.toLowerCase()) {
@@ -148,7 +152,7 @@ function orderTvShows(tvShows, type: string) {
     })
 }
 
-function searchTvShows(tvShows, search: string) {
+function searchListInTvShow(tvShows, search: string) {
     return tvShows.filter(tvShow => tvShow.title.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 
@@ -165,12 +169,14 @@ function filterRelease(release: string, tvShow) {
     return false
 }
 
-function filterTvShows(tvShows, categoryId: string, release: string, countryId: string) {
+function filterListInTvShow(tvShows, categoryId: string, release: string, countryId: string) {
     return tvShows.filter(tvShow => {
         if (
             (release.length === 0 || filterRelease(release, tvShow)) &&
-            (categoryId.length === 0 || ((categoryId === "-1" && tvShow.categories_id.length === 0) || (tvShow.categories_id.filter(c => c === categoryId).length > 0))) &&
-            (countryId.length === 0 || ((countryId === "-1" && tvShow.countries_id.length === 0) || (tvShow.countries_id.filter(c => c === countryId).length > 0)))
+            (categoryId.length === 0 || ((categoryId === "-1" && tvShow.categories_id.length === 0)
+                || (tvShow.categories_id.filter(c => c === categoryId).length > 0))) &&
+            (countryId.length === 0 || ((countryId === "-1" && tvShow.countries_id.length === 0)
+                || (tvShow.countries_id.filter(c => c === countryId).length > 0)))
         ) {
             return true
         }
@@ -178,81 +184,89 @@ function filterTvShows(tvShows, categoryId: string, release: string, countryId: 
     })
 }
 
-export const getTvShowAllByNotMyTvShow = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void, searchTextValue = "") => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/open/all/notmytvshow", { object: { category: true, country: true } }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.datas
-            const tvShowsValue = dataApi
-            let tvShowsFilterValue = searchTvShows(tvShowsValue, searchTextValue)
-            tvShowsFilterValue = orderTvShows(tvShowsFilterValue, "title")
-            dispatch({ type: TV_SHOW_LIST_REDUCER, tvShows: tvShowsValue, tvShowsFilter: tvShowsFilterValue })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const openAllNoMyTvShowInTvShow = (callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void, searchTextValue = "") => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("tvshow/open/all/notmytvshow").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const tvShowsValue = dataApi
+                let tvShowsFilterValue = searchListInTvShow(tvShowsValue, searchTextValue)
+                tvShowsFilterValue = orderListInTvShow(tvShowsFilterValue, "title")
+                dispatch({ type: TV_SHOW_LIST_REDUCER, tvShows: tvShowsValue, tvShowsFilter: tvShowsFilterValue })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-export const getDetailsTvShowAll = (tvShowsGeneral, tvShowsPagination, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const idsTvShow: any[] = []
-    for (let tg = 0; tg < tvShowsGeneral.length; tg++) {
-        let statusDetails = false
-        for (let t = 0; t < tvShowsPagination.length; t++) {
-            if (tvShowsPagination[t]._id === tvShowsGeneral[tg]._id) {
-                statusDetails = true
+export const openAllDetailInTvShow = (tvShowsGeneral, tvShowsPagination, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const idsTvShow: any[] = []
+        for (let tg = 0; tg < tvShowsGeneral.length; tg++) {
+            let statusDetails = false
+            for (let t = 0; t < tvShowsPagination.length; t++) {
+                if (tvShowsPagination[t]._id === tvShowsGeneral[tg]._id) {
+                    statusDetails = true
+                }
+            }
+            if (statusDetails) {
+                idsTvShow.push(tvShowsGeneral[tg]._id)
             }
         }
-        if (statusDetails) {
-            idsTvShow.push(tvShowsGeneral[tg]._id)
-        }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.post("tvshow/open/details/all", { tvShowIds: idsTvShow }).then(response => {
+            if (response.data.status) {
+                const tvShowsData = response.data.datas
+                const tvShowsNew = tvShowsGeneral.map(m => {
+                    const tvShowsDataFilter = tvShowsData.filter(md => md._id === m._id)
+                    if (tvShowsDataFilter.length > 0)
+                        return tvShowsDataFilter[0]
+                    return m
+                })
+                dispatch({ type: TV_SHOW_LIST_FILTER_REDUCER, tvShows: tvShowsNew })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
     }
-    await api.post("tvshow/open/details/all", { tvShowIds: idsTvShow, object: { category: true, country: true } }).then(response => {
-        if (response.data.status) {
-            const tvShowsData = response.data.datas
-            const tvShowsNew = tvShowsGeneral.map(m => {
-                const tvShowsDataFilter = tvShowsData.filter(md => md._id === m._id)
-                if (tvShowsDataFilter.length > 0)
-                    return tvShowsDataFilter[0]
-                return m
-            })
-            dispatch({ type: TV_SHOW_LIST_FILTER_REDUCER, tvShows: tvShowsNew })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
 
-export const getTvShowAllByOrderAndSearchAndFilter = (orderValue: string, searchValue: string, categoryValue: string, releaseValue: string, countryValue: string, tvShowsGeneral: []) => async dispatch => {
-    let tvShowsValue = filterTvShows(tvShowsGeneral, categoryValue, releaseValue, countryValue)
-    tvShowsValue = searchTvShows(tvShowsValue, searchValue)
-    tvShowsValue = orderTvShows(tvShowsValue, orderValue)
-    dispatch({ type: TV_SHOW_LIST_FILTER_REDUCER, tvShows: tvShowsValue })
-}
+export const openAllByOrderAndSearchAndFilterInTvShow = (orderValue: string, searchValue: string,
+    categoryValue: string, releaseValue: string, countryValue: string, tvShowsGeneral: []) => async dispatch => {
+        let tvShowsValue = filterListInTvShow(tvShowsGeneral, categoryValue, releaseValue, countryValue)
+        tvShowsValue = searchListInTvShow(tvShowsValue, searchValue)
+        tvShowsValue = orderListInTvShow(tvShowsValue, orderValue)
+        dispatch({ type: TV_SHOW_LIST_FILTER_REDUCER, tvShows: tvShowsValue })
+    }
 
-export const getTvShowAll = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void, orderValue = "title", searchTextValue = "", categoryValue = "", releaseValue = "", countryValue = "") => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("tvshow/open/all", { object: { category: true, country: true } }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.datas
-            const tvShowsValue = dataApi
-            let tvShowsFilterValue = filterTvShows(tvShowsValue, categoryValue, releaseValue, countryValue)
-            tvShowsFilterValue = searchTvShows(tvShowsFilterValue, searchTextValue)
-            tvShowsFilterValue = orderTvShows(tvShowsFilterValue, orderValue)
-            dispatch({ type: TV_SHOW_LIST_REDUCER, tvShows: tvShowsValue, tvShowsFilter: tvShowsFilterValue })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
+export const openAllInTvShow = (callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void,
+    orderValue = "title", searchTextValue = "", categoryValue = "", releaseValue = "", countryValue = "") =>
+    async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("tvshow/open").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const tvShowsValue = dataApi
+                let tvShowsFilterValue = filterListInTvShow(tvShowsValue, categoryValue, releaseValue, countryValue)
+                tvShowsFilterValue = searchListInTvShow(tvShowsFilterValue, searchTextValue)
+                tvShowsFilterValue = orderListInTvShow(tvShowsFilterValue, orderValue)
+                dispatch({ type: TV_SHOW_LIST_REDUCER, tvShows: tvShowsValue, tvShowsFilter: tvShowsFilterValue })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const clearAllInTvShow = () => async dispatch => {
+    dispatch({ type: TV_SHOW_LIST_REDUCER, tvShows: [], tvShowsFilter: [] })
 }

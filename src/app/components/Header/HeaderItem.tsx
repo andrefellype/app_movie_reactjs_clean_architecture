@@ -8,12 +8,13 @@ import IconList from "../IconList"
 
 type HeaderItemModel = {
     icon?: string | null, title?: string | null, badgeText?: string | null, isNotification?: boolean,
-    notifications?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
-    dropdowns?: { text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }[],
-    redirectUrl?: string | null, clickOut?: (() => void) | null, sx?: object
+    notifications?: {
+        text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null
+    }[], dropdowns?: {
+        text: string | string[], icon: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null
+    }[], redirectUrl?: string | null, clickOut?: (() => void) | null, sx?: object
 }
 const HeaderItem: React.FC<HeaderItemModel> = function ({ icon, title, badgeText, isNotification, notifications, dropdowns, redirectUrl, clickOut, sx }): JSX.Element | null {
-
     const navigate = useNavigate()
 
     const [showNotification, setShowNotification] = React.useState(false)
@@ -55,8 +56,12 @@ const HeaderItem: React.FC<HeaderItemModel> = function ({ icon, title, badgeText
                     {title}
                 </Badge>
             </IconButton>
-            {getNotifications().length > 0 && <DialogList onCloseDialog={() => setShowNotification(true)} clickCloseDialog={() => setShowNotification(false)} showDialog={showNotification} listDialog={getNotifications()} />}
-            {getDropdowns().length > 0 && <DialogList showDialog={showDropdown} onCloseDialog={() => setShowDropdown(true)} clickCloseDialog={() => setShowDropdown(false)} listDialog={getDropdowns()} />}
+            {getNotifications().length > 0 && <DialogList onCloseDialog={() => setShowNotification(true)}
+                clickCloseDialog={() => setShowNotification(false)} showDialog={showNotification}
+                listDialog={getNotifications()} />}
+            {getDropdowns().length > 0 && <DialogList showDialog={showDropdown}
+                onCloseDialog={() => setShowDropdown(true)} clickCloseDialog={() => setShowDropdown(false)}
+                listDialog={getDropdowns()} />}
         </React.Fragment>
     )
 }

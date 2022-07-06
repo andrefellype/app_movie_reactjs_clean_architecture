@@ -1,101 +1,95 @@
-import CryptographyConvert from "../../components/CryptographyConvert"
+import UpdateHeaderToken from "../../components/Utils/UpdateHeaderToken"
 import api from "../../core/api"
 import { COUNTRY_LIST_FILTER_REDUCER, COUNTRY_LIST_REDUCER, COUNTRY_SINGLE_REDUCER, TOKEN_LOCAL_STORAGE } from "../../core/consts"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteSeveralCountryByIds = (_ids: string[], callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/delete/several", { _ids: JSON.stringify(_ids) }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteAllByIdsInCountry = (_ids: string[], callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put("country/delete", { countryId: JSON.stringify(_ids) }).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const deleteCountryById = (countryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/delete", { countryId: countryIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const deleteByIdInCountry = (countryIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.delete(`country/delete/${countryIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const approvedReviewedCountryById = (countryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/approved/reviewed", { countryId: countryIdValue }).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const updateEnabledByIdInCountry = (countryIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`country/approved/${countryIdValue}`).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const updateCountryById = (countryIdValue: string, initialValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { countryId: countryIdValue, initial: initialValue }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/update", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const updateByIdInCountry = (countryIdValue: string, initialValue: string,
+    callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async () => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.put(`country/update/${countryIdValue}`, { initial: initialValue }).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-export const openCountryById = (countryIdValue: string, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/open", { countryId: countryIdValue }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.data
-            dispatch({ type: COUNTRY_SINGLE_REDUCER, countrySingle: dataApi })
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const openInCountry = (countryIdValue: string, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get(`country/open/${countryIdValue}`).then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.data
+                dispatch({ type: COUNTRY_SINGLE_REDUCER, countrySingle: dataApi })
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const registerCountry = (initialValue: string, reviewedStatus: number, callbackSuccess: () => void, callbackError: (errorsMsg: string[]) => void) => async dispatch => {
-    const objectData = { initial: initialValue, reviewed: reviewedStatus }
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers["x-access-token"] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/register", objectData).then(response => {
-        if (response.data.status) {
-            callbackSuccess()
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+export const createInCountry = (initialValue: string, reviewedStatus: number, callbackSuccess: () => void,
+    callbackError: (errorsMsg: string[]) => void) => async () => {
+        const objectData = { initial: initialValue, reviewed: reviewedStatus }
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.post("country/register", objectData).then(response => {
+            if (response.data.status) {
+                callbackSuccess()
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
 
-function orderCountriesByName(countries) {
+function orderListInCountry(countries) {
     return countries.sort((countryA, countryB) => {
         if (countryA.initial.toLowerCase() > countryB.initial.toLowerCase()) {
             return 1
@@ -107,32 +101,56 @@ function orderCountriesByName(countries) {
     })
 }
 
-function searchCountries(countries, search: string) {
+function searchListInCountry(countries, search: string) {
     return countries.filter(country => country.initial.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 
-export const getCountryAllBySearch = (searchValue: string, countriesGeneral: []) => async dispatch => {
-    let countriesValue = searchCountries(countriesGeneral, searchValue)
-    countriesValue = orderCountriesByName(countriesValue)
+export const openAllBySearchInCountry = (searchValue: string, countriesGeneral: []) => async dispatch => {
+    let countriesValue = searchListInCountry(countriesGeneral, searchValue)
+    countriesValue = orderListInCountry(countriesValue)
     dispatch({ type: COUNTRY_LIST_FILTER_REDUCER, countries: countriesValue })
 }
 
-export const getCountryAll = (callbackSuccess: (() => void) | null, callbackError: (errorsMsg: string[]) => void, listGeneralValue: number, search = "") => async dispatch => {
-    const token = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-    api.defaults.headers['x-access-token'] = token !== null ? CryptographyConvert("base64", token, "decode") : token
-    await api.post("country/open/all", { listGeneral: listGeneralValue }).then(response => {
-        if (response.data.status) {
-            const dataApi = response.data.datas
-            const countriesValue = orderCountriesByName(dataApi)
-            const countriesFilterValue = searchCountries(countriesValue, search)
-            dispatch({ type: COUNTRY_LIST_REDUCER, countries: countriesValue, countriesFilter: countriesFilterValue })
-            if (typeof callbackSuccess !== "undefined" && callbackSuccess !== null) {
-                callbackSuccess()
+export const openAllByAuthorizedInCountry = (callbackSuccess: (() => void) | null,
+    callbackError: (errorsMsg: string[]) => void, search = "") => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("country/open/authorized").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const countriesValue = orderListInCountry(dataApi)
+                const countriesFilterValue = searchListInCountry(countriesValue, search)
+                dispatch({
+                    type: COUNTRY_LIST_REDUCER, countries: countriesValue, countriesFilter: countriesFilterValue
+                })
+                if (typeof callbackSuccess !== "undefined" && callbackSuccess !== null) {
+                    callbackSuccess()
+                }
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
             }
-        } else {
-            callbackError(response.data.errors.map(erro => `${erro.msg}`))
-        }
-    }).catch(() => {
-        window.location.href = "/failpage/error_api"
-    })
-}
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }
+
+export const openAllInCountry = (callbackSuccess: (() => void) | null,
+    callbackError: (errorsMsg: string[]) => void, search = "") => async dispatch => {
+        UpdateHeaderToken(TOKEN_LOCAL_STORAGE, api)
+        await api.get("country/open").then(response => {
+            if (response.data.status) {
+                const dataApi = response.data.datas
+                const countriesValue = orderListInCountry(dataApi)
+                const countriesFilterValue = searchListInCountry(countriesValue, search)
+                dispatch({
+                    type: COUNTRY_LIST_REDUCER, countries: countriesValue, countriesFilter: countriesFilterValue
+                })
+                if (typeof callbackSuccess !== "undefined" && callbackSuccess !== null) {
+                    callbackSuccess()
+                }
+            } else {
+                callbackError(response.data.errors.map(erro => `${erro.msg}`))
+            }
+        }).catch(() => {
+            window.location.href = "/failpage/error_api"
+        })
+    }

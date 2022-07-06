@@ -5,7 +5,7 @@ const utilsAppReduxScrollToTop = function (state: { scrollToTop: true }, action)
         case SCROLL_TO_TOP_REDUCER:
             return { ...state, scrollToTop: action.status }
         default:
-            return { ...state }
+            return { ...state, scrollToTop: true }
     }
 }
 

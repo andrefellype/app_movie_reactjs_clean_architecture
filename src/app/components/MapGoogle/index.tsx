@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable react/prefer-stateless-function */
 import React from 'react'
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api"
 
@@ -11,10 +10,12 @@ const markerRed = '/icon_map/marker_red.png'
 const markerYellow = '/icon_map/marker_yellow.png'
 
 class GoogleMapComponent extends React.Component<{
-    keyMapGoogle: string, positionMap: { lat: number, lng: number }, zoomMap?: number, markerMain: { lat: number, lng: number }, iconMain?: string,
-    markerList?: { title: string, lat: number, lng: number, pinMap: string, actionClick: () => void }[], clickableMain?: boolean, visibilityOtherMarker?: "on" | "off", style?: object
+    keyMapGoogle: string, positionMap: { lat: number, lng: number }, zoomMap?: number, markerMain: {
+        lat: number, lng: number
+    }, iconMain?: string, markerList?: {
+        title: string, lat: number, lng: number, pinMap: string, actionClick: () => void
+    }[], clickableMain?: boolean, visibilityOtherMarker?: "on" | "off", style?: object
 }> {
-
     public static PIN_MAP_BLACK = "pin_map_black"
 
     public static PIN_MAP_BLUE = "pin_map_blue"
@@ -28,7 +29,10 @@ class GoogleMapComponent extends React.Component<{
     public static PIN_MAP_YELLOW = "pin_map_yellow"
 
     render() {
-        const { keyMapGoogle, positionMap, zoomMap = 14, markerMain = null, iconMain = '/icon_map/marker_purple.png', markerList = null, clickableMain = false, visibilityOtherMarker = "off", ...other } = this.props
+        const {
+            keyMapGoogle, positionMap, zoomMap = 14, markerMain = null, iconMain = '/icon_map/marker_purple.png',
+            markerList = null, clickableMain = false, visibilityOtherMarker = "off", ...other
+        } = this.props
 
         function getPinMap(pinMap: string | undefined): string {
             if (pinMap === GoogleMapComponent.PIN_MAP_BLACK) {
@@ -58,10 +62,16 @@ class GoogleMapComponent extends React.Component<{
 
         return (
             <LoadScript googleMapsApiKey={keyMapGoogle}>
-                <GoogleMap {...other} mapContainerStyle={{ width: '100%', height: '100%' }} center={positionMap} zoom={zoomMap}
-                    options={{
-                        streetViewControl: false, scaleControl: true, fullscreenControl: false, disableDoubleClickZoom: true, clickableIcons: true,
-                        styles: [{ featureType: "poi.business", elementType: "labels", stylers: [{ visibility: visibilityOtherMarker }] }],
+                <GoogleMap {...other} mapContainerStyle={{ width: '100%', height: '100%' }} center={positionMap}
+                    zoom={zoomMap} options={{
+                        streetViewControl: false, scaleControl: true, fullscreenControl: false,
+                        disableDoubleClickZoom: true, clickableIcons: true, styles: [
+                            {
+                                featureType: "poi.business", elementType: "labels", stylers: [
+                                    { visibility: visibilityOtherMarker }
+                                ]
+                            }
+                        ]
                     }}>
                     {markerMain && <Marker clickable={clickableMain} icon={iconMain} title="Minha posição"
                         position={markerMain} />}

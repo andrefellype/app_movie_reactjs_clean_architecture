@@ -1,6 +1,8 @@
 import { MY_TV_SHOW_LIST_FILTER_REDUCER, MY_TV_SHOW_LIST_REDUCER } from "../../core/consts"
 
-const mytvshow = function (state: { myTvShows: [], myTvShowsFilter: [] }, action) {
+const mytvshow = function (state: {
+    myTvShows: [], myTvShowsFilter: []
+}, action) {
     switch (action.type) {
         case MY_TV_SHOW_LIST_FILTER_REDUCER:
             return {

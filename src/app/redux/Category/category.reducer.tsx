@@ -1,6 +1,10 @@
-import { CATEGORY_LIST_FILTER_REDUCER, CATEGORY_LIST_REDUCER, CATEGORY_SINGLE_REDUCER } from "../../core/consts"
+import {
+    CATEGORY_LIST_FILTER_REDUCER, CATEGORY_LIST_REDUCER, CATEGORY_SINGLE_REDUCER
+} from "../../core/consts"
 
-const category = function (state: { category: null, categories: [], categoriesFilter: [] }, action) {
+const category = function (state: {
+    category: null, categories: [], categoriesFilter: []
+}, action) {
     switch (action.type) {
         case CATEGORY_LIST_FILTER_REDUCER:
             return {

@@ -1,7 +1,11 @@
-import CryptographyConvert from "../../components/CryptographyConvert"
-import { TOKEN_LOCAL_STORAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER, USER_LOCAL_STORAGE, USER_SINGLE_REDUCER } from "../../core/consts"
+import GetLocalStorage from "../../components/Utils/GetLocalStorage"
+import {
+    TOKEN_LOCAL_STORAGE, USER_ACCESS_REDUCER, USER_LIST_FILTER_REDUCER, USER_LIST_REDUCER, USER_LOCAL_STORAGE, USER_SINGLE_REDUCER
+} from "../../core/consts"
 
-const user = function (state: { userAccess: null, user: null, tokenAccess: null, users: [], usersFilter: [] }, action) {
+const user = function (state: {
+    userAccess: null, user: null, tokenAccess: null, users: [], usersFilter: []
+}, action) {
     switch (action.type) {
         case USER_LIST_FILTER_REDUCER:
             return {
@@ -23,17 +27,11 @@ const user = function (state: { userAccess: null, user: null, tokenAccess: null,
                 tokenAccess: action.tokenAccess,
             }
         default:
-            let userLocal = localStorage.getItem(USER_LOCAL_STORAGE)
-            if (userLocal !== null) {
-                userLocal = CryptographyConvert("base64", userLocal, "decode")
-            }
+            let userLocal = GetLocalStorage(USER_LOCAL_STORAGE)
             if (userLocal !== null) {
                 userLocal = JSON.parse(userLocal)
             }
-            let tokenLocal = localStorage.getItem(TOKEN_LOCAL_STORAGE)
-            if (tokenLocal) {
-                tokenLocal = CryptographyConvert("base64", tokenLocal, "decode")
-            }
+            const tokenLocal = GetLocalStorage(TOKEN_LOCAL_STORAGE)
             return {
                 ...state,
                 userAccess: userLocal,

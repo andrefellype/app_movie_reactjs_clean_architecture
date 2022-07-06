@@ -1,6 +1,10 @@
-import { COUNTRY_LIST_FILTER_REDUCER, COUNTRY_LIST_REDUCER, COUNTRY_SINGLE_REDUCER } from "../../core/consts"
+import {
+    COUNTRY_LIST_FILTER_REDUCER, COUNTRY_LIST_REDUCER, COUNTRY_SINGLE_REDUCER
+} from "../../core/consts"
 
-const country = function (state: { country: null, countries: [], countriesFilter: [] }, action) {
+const country = function (state: {
+    country: null, countries: [], countriesFilter: []
+}, action) {
     switch (action.type) {
         case COUNTRY_LIST_FILTER_REDUCER:
             return {

@@ -1,6 +1,8 @@
 import { LOADING_SHOW_PATTERN_REDUCER, LOADING_SHOW_TABLE_REDUCER } from "../../core/consts"
 
-const utilsAppReduxLoading = function (state: { statusPattern: false, titlePattern: "", statusTable: false, titleTable: "" }, action) {
+const utilsAppReduxLoading = function (state: {
+    statusPattern: false, titlePattern: "", statusTable: false, titleTable: ""
+}, action) {
     switch (action.type) {
         case LOADING_SHOW_TABLE_REDUCER:
             return {

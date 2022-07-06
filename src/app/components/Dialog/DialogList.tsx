@@ -6,12 +6,14 @@ import ButtonDanger from '../Button/ButtonDanger'
 
 import IconList from '../IconList'
 
-export type DialogListModel = { text: string | string[], icon?: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null }
+export type DialogListModel = {
+    text: string | string[], icon?: string, cursorClick?: "pointer" | null, actionClick?: (() => void) | null
+}
 
 export default class DialogList extends React.Component<{
-    showDialog: boolean, onCloseDialog?: () => void, clickCloseDialog?: () => void, listDialog: DialogListModel[], style?: object
+    showDialog: boolean, onCloseDialog?: () => void, clickCloseDialog?: () => void, listDialog: DialogListModel[],
+    style?: object
 }> {
-
     render() {
         const { showDialog, onCloseDialog, clickCloseDialog, listDialog, children, ...other } = this.props
 
@@ -30,7 +32,8 @@ export default class DialogList extends React.Component<{
                             <ListItem style={{ cursor: `${item.cursorClick !== null && item.cursorClick}` }}
                                 onClick={actionClickDialog(item)}>
                                 <ListItemIcon>
-                                    {item.icon && <IconList style={{ marginTop: 5, marginBottom: 5, marginRight: 5 }} icon={item.icon} />}
+                                    {item.icon && <IconList style={{ marginTop: 5, marginBottom: 5, marginRight: 5 }}
+                                        icon={item.icon} />}
                                     {typeof item.text === 'string' ? <ListItemText primary={<b>{item.text}</b>} /> :
                                         item.text.map(itText => <ListItemText primary={<b>{itText}</b>} />)}
                                 </ListItemIcon>

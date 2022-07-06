@@ -1,6 +1,10 @@
-import { TV_SHOW_SEASON_LIST_FILTER_REDUCER, TV_SHOW_SEASON_LIST_REDUCER, TV_SHOW_SEASON_SINGLE_REDUCER } from "../../core/consts"
+import {
+    TV_SHOW_SEASON_LIST_FILTER_REDUCER, TV_SHOW_SEASON_LIST_REDUCER, TV_SHOW_SEASON_SINGLE_REDUCER
+} from "../../core/consts"
 
-const tvshowseason = function (state: { season: null, seasons: [], seasonsFilter: [] }, action) {
+const tvshowseason = function (state: {
+    season: null, seasons: [], seasonsFilter: []
+}, action) {
     switch (action.type) {
         case TV_SHOW_SEASON_LIST_FILTER_REDUCER:
             return {
