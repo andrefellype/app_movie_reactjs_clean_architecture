@@ -145,7 +145,7 @@ const MyTvShowNewPageView: React.FC<{
             setSearchTextTvShow(search)
             if (typeAction === "typing") {
                 if (typingTimeout) {
-                    clearTimeout(typingTimeout);
+                    clearTimeout(typingTimeout)
                 }
                 // eslint-disable-next-line prefer-arrow-callback
                 setTypingTimeout(setTimeout(() => searchFinishTvShow(search), 500))

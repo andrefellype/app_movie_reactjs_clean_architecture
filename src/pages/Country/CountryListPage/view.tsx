@@ -88,7 +88,7 @@ const CountryListPageView: React.FC<{
             setSearchText(search)
             if (typeAction === "typing") {
                 if (typingTimeout) {
-                    clearTimeout(typingTimeout);
+                    clearTimeout(typingTimeout)
                 }
                 // eslint-disable-next-line prefer-arrow-callback
                 setTypingTimeout(setTimeout(() => searchFinish(search), 500))
