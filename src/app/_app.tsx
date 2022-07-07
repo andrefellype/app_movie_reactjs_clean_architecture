@@ -165,16 +165,14 @@ function App() {
         } else if (checkUser === 1) {
             statusSignIn = getAuthenticate
         }
-        if (checkUser === 1 && getAuthenticate) {
-            if (checkUser === 1 && getAuthenticate) {
-                if (checkLevels.length > 0 && notLevels.length > 0) {
-                    statusSignIn = (checkLevels.filter(cl => getAuthenticate.level === cl).length > 0
-                        && notLevels.filter(nl => nl === getAuthenticate.level).length === 0)
-                } else if (checkLevels.length > 0) {
-                    statusSignIn = checkLevels.filter(cl => getAuthenticate.level === cl).length > 0
-                } else if (notLevels.length > 0) {
-                    statusSignIn = notLevels.filter(nl => nl === getAuthenticate.level).length === 0
-                }
+        if (statusSignIn && getAuthenticate) {
+            if (checkLevels.length > 0 && notLevels.length > 0) {
+                statusSignIn = (checkLevels.filter(cl => getAuthenticate.level === cl).length > 0
+                    && notLevels.filter(nl => nl === getAuthenticate.level).length === 0)
+            } else if (checkLevels.length > 0) {
+                statusSignIn = checkLevels.filter(cl => getAuthenticate.level === cl).length > 0
+            } else if (notLevels.length > 0) {
+                statusSignIn = notLevels.filter(nl => nl === getAuthenticate.level).length === 0
             }
         }
         return statusSignIn
